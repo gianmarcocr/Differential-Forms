@@ -27,11 +27,14 @@ def timeline(t_max: int, dt: float, t_min: int = 0):
 
 def plot_drawing(x, y, save_path=None, bc="w", lc="k", lw=1.0):
     fig = plt.figure(figsize=(20, 20))
+
     if bc != "w":
         fig.patch.set_facecolor(bc)
 
     plt.plot(x, y, color=lc, linewidth=lw)
     plt.axis('off')
     plt.tight_layout()
+    plt.show()
     if save_path:
         fig.savefig(save_path, dpi=300)
+

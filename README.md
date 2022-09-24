@@ -1,6 +1,6 @@
 # Differential Forms
 
-Made by Gianmarco Cracco & Andrea Borghi
+Made by Gianmarco Cracco & Andrea Borghi. Our [Instagram](https://instagram.com/differentialforms?igshid=YmMyMTA2M2Y=).
 
 ![](sample_img/sample_plot.jpg)
 
