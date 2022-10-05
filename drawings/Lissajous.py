@@ -27,7 +27,7 @@ class Lissajous:
         utils.plot_drawing(self.x, self.y, save, bc=background, lc=linecolor, lw=linewidth)
 
     def rotate(self, x_rot, y_rot, t_background):
-        self.x, self.y = utils.rotate_curve(self.x, self.y, self.time, x_rot=x_rot, y_rot=y_rot,
+        self.x, self.y = utils.rotate_curve(self.x, self.y, self.t, x_rot=x_rot, y_rot=y_rot,
                                             t_background=t_background)
         return self  # TODO should this return something? this should overwrite the original coords or crete new one?
 
