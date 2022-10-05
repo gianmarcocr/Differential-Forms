@@ -23,9 +23,9 @@ pip install -r requirements.txt
 
 
 ### Coming soon:
-- [ ] Demo script
-- [ ] More sample images 
-- [ ] Detailed explanation
-- [ ] Parameters dump
-- [ ] Move to abstact class
-- [x] Jupyter Notebook
+- [ ] Demo script;
+- [ ] More sample images; 
+- [ ] Detailed explanation;
+- [ ] Parameters dump;
+- [ ] Move to abstact class;
+- [x] Jupyter Notebook;

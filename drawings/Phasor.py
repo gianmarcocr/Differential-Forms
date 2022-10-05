@@ -2,8 +2,8 @@ import numpy as np
 import utils
 import os
 from datetime import datetime
-import math
 import warnings
+import matplotlib.pyplot as plt
 
 
 class Phasor:
@@ -73,6 +73,8 @@ class Pintograph:
         self.u = extension
         self.choice = choice
         self.x, self.y = self.solution
+        self.save_path = os.environ["today_path"] + "/Pintograph/"
+        if not os.path.exists(self.save_path): os.makedirs(self.save_path)
 
     @property
     def solution(self):
@@ -152,3 +154,27 @@ class Pintograph:
         if save:
             save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
         utils.plot_drawing(self.x, self.y, save, bc=background, lc=linecolor, lw=linewidth)
+
+    def display(self):
+        fig, ax = plt.subplots(figsize=(15, 15))
+        alpha = 0.5
+        ax.set_facecolor("white")
+        ax.axis('equal')
+        p1 = ax.plot(self.p1.x, self.p1.y, label=f'Phasor 1: r={self.p1.r} ', alpha=alpha)
+        ax.plot(self.p1.x_c, self.p1.y_c, c=p1[0].get_color(), marker="o", alpha=alpha)
+        ax.plot([self.p1.x[0], self.x[0]], [self.p1.y[0], self.y[0]], 'k', label=f"Arm 1: l={self.l1}", alpha=alpha,
+                zorder=2)
+        p2 = ax.plot(self.p2.x, self.p2.y, label=f'Phasor 2: r={self.p2.r}', alpha=alpha)
+        ax.plot(self.p2.x_c, self.p2.y_c, c=p2[0].get_color(), marker="o", alpha=alpha)
+        ax.plot([self.p2.x[0], self.x[0]], [self.p2.y[0], self.y[0]], 'k', label=f"Arm 2: l={self.l2}", alpha=alpha,
+                zorder=2)
+        ax.plot(self.x, self.y, label='Pintograph', alpha=1, c="k", lw=2, zorder=1)
+        start_x, end_x = ax.get_xlim()
+        ax.xaxis.set_ticks(np.arange(int(start_x), int(end_x), 0.5))
+        start_y, end_y = ax.get_ylim()
+        ax.yaxis.set_ticks(np.arange(int(start_y), int(end_y), 0.5))
+        ax.grid(b=True, which='both', color='k', linestyle='-', alpha=alpha)
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_title("Pintograph")
+        ax.legend()
