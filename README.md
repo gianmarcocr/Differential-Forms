@@ -20,3 +20,11 @@ python -m venv venv
 venv/bin/activate
 pip install -r requirements.txt
 ```
+
+
+### Coming soon:
+* demo script
+* more sample images
+* detailed explanation
+* parameter dump
+* move to abstact class

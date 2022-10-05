@@ -1,131 +1,40 @@
 import numpy as np
+import utils
+import os
+from datetime import datetime
+import math
+import warnings
 
 
-def phasor(t, x, y, r, T, phase):
-    if isinstance(r, (int, float)):
-        r1 = r * np.ones_like(t)
-    else:
-        r1 = r
-        # r1 = r(t)/tmax
-    pointx = x + r1 * np.cos((2 * np.pi / T) * t + phase)
-    pointy = y + r1 * np.sin((2 * np.pi / T) * t + phase)
+class Phasor:
+    def __init__(self, t_max, dt=0.1, x_cent=0, y_cent=0, radius=1, period=10, phase=0):  # TODO typing
+        self.x_c = x_cent
+        self.y_c = y_cent
+        self.r = radius
+        self.t = utils.timeline(t_max=t_max, dt=dt)
+        self.T = period
+        self.phi = phase
+        self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
+        self.y = self.y_c + self.r * np.sin((2 * np.pi / self.T) * self.t + self.phi)
 
-    return np.vstack((pointx, pointy)).T
+    # def __make_coord(self):
+    #
+    #     return np.column_stack((x, y))
 
-
-def upper_intersection(x0, y0, r0, x1, y1, r1):
-    """
-    # circle 1: (x0, y0), radius r0
-    # circle 2: (x1, y1), radius r1
-    """
-    d = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2)
-    # non intersecting
-    if d > r0 + r1:
-        return np.nan, np.nan
-    # One circle within other
-    if d < abs(r0 - r1):
-        return np.nan, np.nan
-    # coincident circles
-    if d == 0 and r0 == r1:
-        return np.nan, np.nan
-    else:
-        a = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
-        h = np.sqrt(r0 ** 2 - a ** 2)
-        x2 = x0 + a * (x1 - x0) / d
-        y2 = y0 + a * (y1 - y0) / d
-        x3 = x2 + h * (y1 - y0) / d
-        y3 = y2 - h * (x1 - x0) / d
-
-        x4 = x2 - h * (y1 - y0) / d
-        y4 = y2 + h * (x1 - x0) / d
-
-        if y3 >= y4:  # selezione soluzione
-            [x, y] = [x3, y3]
-        else:
-            [x, y] = [x4, y4]
-
-        return x, y
-        # return ([x3, y3], [x4, y4])
+    def __getitem__(self, item):
+        return self.x[item], self.y[item]
+    # def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
+    #     if save:
+    #         save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
+    #     utils.plot_drawing(self.x, self.y, save, bc=background, lc=linecolor, lw=linewidth)
 
 
-def intersection(x0, y0, r0, x1, y1, r1, choice):
-    """
-    # circle 1: (x0, y0), radius r0
-    # circle 2: (x1, y1), radius r1
-    """
-
-    d = np.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2)
-    # non intersecting
-    if d > r0 + r1:
-        return np.nan, np.nan
-    # One circle within other
-    if d < abs(r0 - r1):
-        return np.nan, np.nan
-    # coincident circles
-    if d == 0 and r0 == r1:
-        return np.nan, np.nan
-    else:
-        a = (r0 ** 2 - r1 ** 2 + d ** 2) / (2 * d)
-        h = np.sqrt(r0 ** 2 - a ** 2)
-        x2 = x0 + a * (x1 - x0) / d
-        y2 = y0 + a * (y1 - y0) / d
-        x3 = x2 + h * (y1 - y0) / d
-        y3 = y2 - h * (x1 - x0) / d
-
-        x4 = x2 - h * (y1 - y0) / d
-        y4 = y2 + h * (x1 - x0) / d
-
-        if choice == "up":
-            if y3 >= y4:  # selezione soluzione
-                [x, y] = [x3, y3]
-            else:
-                [x, y] = [x4, y4]
-        elif choice == "down":
-            if y3 <= y4:  # selezione soluzione
-                [x, y] = [x3, y3]
-            else:
-                [x, y] = [x4, y4]
-
-        return x, y
-
-
-def line_from_points(P, Q):
-    a = Q[1] - P[1]
-    b = Q[0] - P[0]
-
+def line_from_points(p, q):
+    a = q[1] - p[1]
+    b = q[0] - p[0]
     m = a / b
-    q = (Q[0] * P[1] - P[0] * Q[1]) / b
+    q = (q[0] * p[1] - p[0] * q[1]) / b
     return m, q
-
-
-def solution(Px, Py, l1, Qx, Qy, l2, u=0, choice="up"):
-    sol = []
-    for i in range(len(Px)):
-        """p1, p2 = upper_intersection(Px[i],Py[i], l1 ,Qx[i], Qy[i], l2)
-
-        m, q = lineFromPoints([Px[i],Py[i]],[Qx[i],Qy[i]])
-        if p1[1] >= m * p1[0] + q:
-            alpha = np.arctan(m)
-            if alpha > 0:
-                sol.append([p1[0] + np.cos(alpha), p1[1] + np.sin(alpha)])
-            else:
-                sol.append([p1[0] - np.cos(alpha), p1[1] - np.sin(alpha)])
-        else:
-            sol.append(p2)"""
-
-        # x,y = upper_intersection(Px[i],Py[i], l1 ,Qx[i], Qy[i], l2)
-        x, y = intersection(Px[i], Py[i], l1, Qx[i], Qy[i], l2, choice)
-        sol.append([x, y])
-        if u > 0:
-            m, q = line_from_points([Px[i], Py[i]], sol[i])
-            alpha = np.arctan(m)
-            if alpha > 0:
-                sol[i][0] = sol[i][0] + u * np.cos(alpha)
-                sol[i][1] = sol[i][1] + u * np.sin(alpha)
-            else:
-                sol[i][0] = sol[i][0] - u * np.cos(alpha)
-                sol[i][1] = sol[i][1] - u * np.sin(alpha)
-    return np.asarray(sol)
 
 
 def linecircle(x, y, r, m, q, choice):
@@ -155,5 +64,91 @@ def prolunga(Sx, Sy, Cx, Cy, r, choice="2"):
     return np.asarray(sol)
 
 
-class Phasor:
-    def __int__(self):
+class Pintograph:
+    def __init__(self, phasor1, phasor2, arm1, arm2, extension, choice="up"):
+        self.p1 = phasor1
+        self.p2 = phasor2
+        self.l1 = arm1
+        self.l2 = arm2
+        self.u = extension
+        self.choice = choice
+        self.x, self.y = self.solution
+
+    @property
+    def solution(self):
+        sol_x = []
+        sol_y = []
+        for i in range(len(self.p1.x)):
+            x, y = self.intersection(self.p1.x[i], self.p1.y[i], self.l1, self.p2.x[i], self.p2.y[i], self.l2,
+                                     self.choice)
+            sol_x.append(x)
+            sol_y.append(y)
+            if self.u > 0:
+                m, q = line_from_points([self.p1.x[i], self.p1.y[i]], [sol_x[i], sol_y[i]])
+                alpha = np.arctan(m)
+                if alpha > 0:
+                    sol_x[i] += self.u * np.cos(alpha)
+                    sol_y[i] += self.u * np.sin(alpha)
+                else:
+                    sol_x[i] -= self.u * np.cos(alpha)
+                    sol_y[i] -= self.u * np.sin(alpha)
+        return np.asarray(sol_x), np.asarray(sol_y)
+
+    @staticmethod
+    def intersection(x1, y1, r1, x2, y2, r2, choice):
+        """
+        source: https://stackoverflow.com/questions/55816902/finding-the-intersection-of-two-circles
+        Args:
+            x1:
+            y1:
+            r1:
+            x2:
+            y2:
+            r2:
+            choice:
+
+        Returns:
+
+        """
+        d = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        x, y = np.nan, np.nan
+        # non intersecting
+        if d > r1 + r2:
+            warnings.warn(f"Distance between phasors > sum of arms length: {d}>{r1}+{r2}")
+            return x, y
+        # One circle within other
+        elif d < abs(r1 - r2):
+            warnings.warn(f"Inscribed circles: {d}<|{r1}-{r2}|")
+            return x, y
+        # coincident circles
+        elif d == 0 and r1 == r2:
+            warnings.warn(f"Coincident circles or arms length==0: d={d}, arm1={r1} arm2={r2}")
+            return x, y
+        else:
+            a = (r1 ** 2 - r2 ** 2 + d ** 2) / (2 * d)
+            h = np.sqrt(r1 ** 2 - a ** 2)
+            x3 = x1 + a * (x2 - x1) / d
+            y3 = y1 + a * (y2 - y1) / d
+
+            x4 = x3 + h * (y2 - y1) / d
+            y4 = y3 - h * (x2 - x1) / d
+            x5 = x3 - h * (y2 - y1) / d
+            y5 = y3 + h * (x2 - x1) / d
+
+            if choice == "up":
+                if y4 >= y5:  # select upper or lower intersection
+                    x, y = x4, y4
+                else:
+                    x, y = x5, y5
+            elif choice == "down":
+                if y4 <= y5:  # selezione soluzione
+                    x, y = x4, y4
+                else:
+                    x, y = x5, y5
+
+            return x, y
+
+    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
+        if save:
+            save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
+        utils.plot_drawing(self.x, self.y, save, bc=background, lc=linecolor, lw=linewidth)
