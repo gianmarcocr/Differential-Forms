@@ -25,7 +25,7 @@ if __name__ == "__main__":
     curve = Phasor(t_max=100, dt=0.1, x_cent=0, y_cent=0, radius=3, period=100, phase=0)
     curve2 = Phasor(t_max=100, dt=0.1, x_cent=2, y_cent=0, radius=3, period=50, phase=np.pi/2)
     pinto = Pintograph(phasor1=curve, phasor2=curve2, arm1=2, arm2=1.5, extension=0)
-    pinto.display()
-    pinto.plot()
+    # pinto.display()
+    pinto.plot(save = True)
     pinto
 

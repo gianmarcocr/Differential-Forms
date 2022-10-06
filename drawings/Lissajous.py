@@ -21,6 +21,10 @@ class Lissajous:
     #
     #     return np.column_stack((x, y))
 
+    def get_metadata(self):
+        liss_meta = self.__dict__.copy()
+        return str(liss_meta)
+
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
         if save:
             save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"

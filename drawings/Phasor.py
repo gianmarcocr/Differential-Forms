@@ -76,6 +76,15 @@ class Pintograph:
         self.save_path = os.environ["today_path"] + "/Pintograph/"
         if not os.path.exists(self.save_path): os.makedirs(self.save_path)
 
+    def get_metadata(self):
+        pinto_meta = self.__dict__.copy()
+        pinto_meta.pop("p1")
+        pinto_meta.pop("p2")
+        p1_meta = self.p1.__dict__
+        p2_meta = self.p2.__dict__
+        meta = "Pintograph:\n" + str(pinto_meta) + "\nPhasor1:\n"+ str(p1_meta) +"\nPhasor2:\n"+ str(p2_meta)
+        return meta
+
     @property
     def solution(self):
         sol_x = []
@@ -153,7 +162,7 @@ class Pintograph:
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
         if save:
             save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
-        utils.plot_drawing(self.x, self.y, save, bc=background, lc=linecolor, lw=linewidth)
+        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
 
     def display(self):
         fig, ax = plt.subplots(figsize=(15, 15))
@@ -178,3 +187,5 @@ class Pintograph:
         ax.set_ylabel("y")
         ax.set_title("Pintograph")
         ax.legend()
+
+

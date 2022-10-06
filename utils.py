@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from PIL import Image
+from PIL.PngImagePlugin import PngInfo
 
 def pol2cart(rho, theta):
     x = rho * np.cos(theta)
@@ -25,16 +26,50 @@ def timeline(t_max: int, dt: float, t_min: int = 0) -> object:
     return np.arange(t_min, t_max, dt)
 
 
-def plot_drawing(x, y, save_path=None, bc="w", lc="k", lw=1.0):
+def fig2img(fig):
+    """Convert a Matplotlib figure to a PIL Image and return it"""
+    import io
+    buf = io.BytesIO()
+    fig.savefig(buf)
+    buf.seek(0)
+    img = Image.open(buf)
+    return img
+
+
+def plot_drawing(draw, save_path=None, bc="w", lc="k", lw=1.0):
+    x = draw.x
+    y = draw.y
+    metadata = draw.get_metadata()
+
     fig = plt.figure(figsize=(20, 20))
+    ax = fig.add_subplot(111)
 
     if bc != "w":
         fig.patch.set_facecolor(bc)
 
-    plt.plot(x, y, color=lc, linewidth=lw)
-    plt.axis('off')
+    ax.plot(x, y, color=lc, linewidth=lw)
+    ax.axis('off')
     plt.tight_layout()
     plt.show()
     if save_path:
-        fig.savefig(save_path, dpi=300)
+        # fig.savefig(save_path, dpi=300)
+        img = fig2img(fig)
+        meta = PngInfo()
+        meta.add_text(draw.__class__.__name__, metadata)
+        img.save(save_path, pnginfo=meta)
+        # targetImage = Image.open(save_path)
+        # testi = targetImage.text
+        # print(testi)
+
+def parse_metadata(data):
+    # result = result or dict()
+    if isinstance(data, dict):
+        for key, item in data.items():
+            if isinstance(item, dict):
+                parse_metadata(item)
+            elif isinstance(data, (list, int, float)):
+                meta.add_text(data, str(item))
+    return
+
+
 
