@@ -16,17 +16,24 @@ class Phasor:
         self.phi = phase
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
         self.y = self.y_c + self.r * np.sin((2 * np.pi / self.T) * self.t + self.phi)
+        self.save_path = os.environ["today_path"]
+        if not os.path.exists(self.save_path): os.makedirs(self.save_path)  # TODO fix all this path situation
 
     # def __make_coord(self):
     #
     #     return np.column_stack((x, y))
 
+    def get_metadata(self):
+        phasor_meta = self.__dict__.copy()
+        return str(phasor_meta)
+
     def __getitem__(self, item):
         return self.x[item], self.y[item]
-    # def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-    #     if save:
-    #         save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
-    #     utils.plot_drawing(self.x, self.y, save, bc=background, lc=linecolor, lw=linewidth)
+
+    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
+        if save:
+            save = self.save_path + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
+        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
 
 
 def line_from_points(p, q):
@@ -73,7 +80,7 @@ class Pintograph:
         self.u = extension
         self.choice = choice
         self.x, self.y = self.solution
-        self.save_path = os.environ["today_path"] + "/Pintograph/"
+        self.save_path = os.environ["today_path"]
         if not os.path.exists(self.save_path): os.makedirs(self.save_path)
 
     def get_metadata(self):
@@ -82,11 +89,12 @@ class Pintograph:
         pinto_meta.pop("p2")
         p1_meta = self.p1.__dict__
         p2_meta = self.p2.__dict__
-        meta = "Pintograph:\n" + str(pinto_meta) + "\nPhasor1:\n"+ str(p1_meta) +"\nPhasor2:\n"+ str(p2_meta)
+        meta = "Pintograph:\n" + str(pinto_meta) + "\nPhasor1:\n" + str(p1_meta) + "\nPhasor2:\n" + str(p2_meta)
         return meta
 
     @property
     def solution(self):
+        assert len(self.p1.t) == len(self.p2.t), print(f"Phasor 1 and 2 time vectors have different lengths: {self.p1.t} != {self.p2.t}")
         sol_x = []
         sol_y = []
         for i in range(len(self.p1.x)):
@@ -188,4 +196,15 @@ class Pintograph:
         ax.set_title("Pintograph")
         ax.legend()
 
+    def rotate(self, x_rot, y_rot, t_background):
+        self.x, self.y = utils.rotate_curve(self.x, self.y, self.p1.t, x_rot=x_rot, y_rot=y_rot,
+                                            t_background=t_background)
+        return self
+
+    def translate(self, v_x, v_y):
+        self.x, self.y = utils.translate_curve(self.x, self.y, self.p1.t, v_x=v_x, v_y=v_y)
+        return self
+
+    def __getitem__(self, item):
+        return self.x[item], self.y[item]
 

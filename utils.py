@@ -44,22 +44,19 @@ def plot_drawing(draw, save_path=None, bc="w", lc="k", lw=1.0):
     fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(111)
 
-    if bc != "w":
-        fig.patch.set_facecolor(bc)
+    fig.patch.set_facecolor(bc)  # remove this to remove background
+
 
     ax.plot(x, y, color=lc, linewidth=lw)
     ax.axis('off')
     plt.tight_layout()
     plt.show()
     if save_path:
-        # fig.savefig(save_path, dpi=300)
-        img = fig2img(fig)
+        fig.savefig(save_path, facecolor=fig.get_facecolor(), dpi=300)
+        img = fig2img(fig)  # TODO fix file extension
         meta = PngInfo()
-        meta.add_text(draw.__class__.__name__, metadata)
-        img.save(save_path, pnginfo=meta)
-        # targetImage = Image.open(save_path)
-        # testi = targetImage.text
-        # print(testi)
+        meta.add_text(draw.__class__.__name__, metadata)  # TODO fix metadata
+        # img.save(save_path, pnginfo=meta)
 
 def parse_metadata(data):
     # result = result or dict()

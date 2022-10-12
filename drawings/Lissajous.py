@@ -14,7 +14,7 @@ class Lissajous:
         self.T_y = y_period
         self.x = np.cos(2 * np.pi / self.T_x * self.t + self.phi)
         self.y = np.sin(2 * np.pi / self.T_y * self.t + self.phi)
-        self.save_path = os.environ["today_path"] + "/Lissajous/"
+        self.save_path = os.environ["today_path"]
         if not os.path.exists(self.save_path): os.makedirs(self.save_path)  # TODO fix all this path situation
 
     # def __make_coord(self):
@@ -28,7 +28,7 @@ class Lissajous:
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
         if save:
             save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
-        utils.plot_drawing(self.x, self.y, save, bc=background, lc=linecolor, lw=linewidth)
+        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
 
     def rotate(self, x_rot, y_rot, t_background):
         self.x, self.y = utils.rotate_curve(self.x, self.y, self.t, x_rot=x_rot, y_rot=y_rot,
@@ -36,7 +36,7 @@ class Lissajous:
         return self  # TODO should this return something? this should overwrite the original coords or crete new one?
 
     def translate(self, v_x, v_y):
-        self.x, self.y = utils.translate_curve(self.x, self.y, self.time, v_x=v_x, v_y=v_y)
+        self.x, self.y = utils.translate_curve(self.x, self.y, self.t, v_x=v_x, v_y=v_y)
         return self
 
     def __getitem__(self, item):
