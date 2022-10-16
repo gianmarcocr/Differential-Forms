@@ -6,6 +6,7 @@ from datetime import date, datetime
 from pathlib import Path
 import os
 import utils
+from tqdm import tqdm
 
 from drawings.Phasor import Phasor, Pintograph
 
@@ -81,8 +82,8 @@ def animate(i):
     return c1, c2, fasore1, fasore2, pint1, arm1, arm2, pint2  # the comma is needed here
 
 
-ani = animation.FuncAnimation(fig, animate, interval=0, blit=False, frames=len(curve1.x))
-# ani.save('test.gif', fps=60)
+ani = animation.FuncAnimation(fig, animate, interval=0, blit=False, frames=tqdm(range(len(curve1.x))))
+ani.save('test.gif', fps=60)
 
 # To save the animation, use e.g.
 #
