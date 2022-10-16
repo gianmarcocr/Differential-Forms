@@ -26,6 +26,7 @@ pip install -r requirements.txt
 - [ ] Demo script;
 - [ ] More sample images; 
 - [ ] Detailed explanation;
-- [ ] Parameters dump;
-- [ ] Move to abstact class;
+- [x] Parameters dump;
+- [ ] Move to abstract class;
 - [x] Jupyter Notebook;
+- [ ] Move to lines instead of points
