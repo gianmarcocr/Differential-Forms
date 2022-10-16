@@ -23,7 +23,7 @@ def translate_curve(x, y, time, v_x, v_y):
 
 
 def timeline(t_max: int, dt: float, t_min: int = 0) -> object:
-    return np.arange(t_min, t_max, dt)
+    return np.arange(t_min, t_max+1, dt)
 
 
 def fig2img(fig):

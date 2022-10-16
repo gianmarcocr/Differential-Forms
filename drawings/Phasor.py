@@ -11,7 +11,7 @@ class Phasor:
         self.x_c = x_cent
         self.y_c = y_cent
         self.r = radius
-        self.t = utils.timeline(t_max=t_max, dt=dt)
+        self.t = utils.timeline(t_min=0,t_max=t_max, dt=dt)
         self.T = period
         self.phi = phase
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
