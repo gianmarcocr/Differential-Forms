@@ -21,7 +21,7 @@ os.environ["today_path"] = str(today_path)
 
 tmax = 200
 dt = 0.1
-tim = utils.timeline(t_max=tmax+1, dt=dt)
+tim = utils.timeline(t_max=tmax, dt=dt)
 
 r1 = 1.5 + np.sin(2*np.pi / 20 * tim)
 r2 = 1
@@ -87,7 +87,7 @@ ani = animation.FuncAnimation(fig, animate, interval=0, blit=False, frames=len(c
 
 # To save the animation, use e.g.
 #
-ani.save("movie.mp4")
+# ani.save("movie.mp4")
 #
 # or
 #
