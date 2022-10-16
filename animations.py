@@ -7,7 +7,6 @@ from pathlib import Path
 import os
 import utils
 
-
 from drawings.Phasor import Phasor, Pintograph
 
 matplotlib.use('TkAgg')
@@ -23,7 +22,7 @@ tmax = 200
 dt = 0.1
 tim = utils.timeline(t_max=tmax, dt=dt)
 
-r1 = 1.5 + np.sin(2*np.pi / 20 * tim)
+r1 = 1.5 + np.sin(2 * np.pi / 20 * tim)
 r2 = 1
 x_rot, y_rot = -3, 5
 
@@ -34,7 +33,6 @@ pinto2 = Pintograph(phasor1=curve1, phasor2=curve2, arm1=5, arm2=5, extension=0)
 pinto2.rotate(-3, 5, tmax)
 
 dist = max(np.sqrt((pinto.x - x_rot) ** 2 + (pinto.y - y_rot) ** 2))
-
 
 fig = plt.figure(figsize=(10, 10))
 ax = fig.add_subplot(111, aspect="equal")
@@ -55,9 +53,10 @@ arm1, = ax.plot([curve1.x[0], pinto.x[0]], [curve1.y[0], pinto.y[0]])
 arm2, = ax.plot([curve2.x[0], pinto.x[0]], [curve2.y[0], pinto.y[0]])
 
 
-
 def animate(i):
     c1.set_data(curve1.x[:i], curve1.y[:i])
+    c2.set_data(curve2.x[:i], curve2.y[:i])
+
     # c1.set_alpha(max(1-i/(tmax/2),0))
     # c2.set_alpha(max(1-i/(tmax/2),0))
     fasore1.set_data(curve1.x[i], curve1.y[i])  # update the data.
