@@ -35,7 +35,7 @@ pinto2.rotate(-3, 5, tmax)
 
 dist = max(np.sqrt((pinto.x - x_rot) ** 2 + (pinto.y - y_rot) ** 2))
 
-fig = plt.figure(figsize=(10, 10))
+fig = plt.figure(figsize=(5, 5))
 ax = fig.add_subplot(111, aspect="equal")
 # max_x, min_x = max(curve1.x.max(), curve2.x.max(), pinto2.x.max()), min(curve1.x.min(), curve2.x.min(), pinto2.x.min())
 # max_y, min_y = max(curve1.y.max(), curve2.y.max(), pinto2.y.max()), min(curve1.y.min(), curve2.y.min(), pinto2.y.min())
@@ -83,7 +83,7 @@ def animate(i):
 
 
 ani = animation.FuncAnimation(fig, animate, interval=0, blit=False, frames=tqdm(range(len(curve1.x))))
-ani.save('test.gif', fps=60)
+#ani.save('test.gif', fps=60)
 
 # To save the animation, use e.g.
 #

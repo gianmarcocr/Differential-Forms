@@ -1,7 +1,6 @@
 import numpy as np
 import utils
 import os
-from datetime import datetime
 import warnings
 import matplotlib.pyplot as plt
 
@@ -16,8 +15,6 @@ class Phasor:
         self.phi = phase
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
         self.y = self.y_c + self.r * np.sin((2 * np.pi / self.T) * self.t + self.phi)
-        self.save_path = os.environ["today_path"]
-        if not os.path.exists(self.save_path): os.makedirs(self.save_path)  # TODO fix all this path situation
 
     # def __make_coord(self):
     #
@@ -27,13 +24,21 @@ class Phasor:
         phasor_meta = self.__dict__.copy()
         return str(phasor_meta)
 
-    def __getitem__(self, item):
-        return self.x[item], self.y[item]
 
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        if save:
-            save = self.save_path + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
         utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
+
+    def rotate(self, x_rot, y_rot, t_background):
+        self.x, self.y = utils.rotate_curve(self.x, self.y, self.t, x_rot=x_rot, y_rot=y_rot,
+                                            t_background=t_background)
+        return self
+
+    def translate(self, v_x, v_y):
+        self.x, self.y = utils.translate_curve(self.x, self.y, self.t, v_x=v_x, v_y=v_y)
+        return self
+
+    def __getitem__(self, item):
+        return self.x[item], self.y[item]
 
 
 def line_from_points(p, q):
@@ -117,17 +122,6 @@ class Pintograph:
     def intersection(x1, y1, r1, x2, y2, r2, choice):
         """
         source: https://stackoverflow.com/questions/55816902/finding-the-intersection-of-two-circles
-        Args:
-            x1:
-            y1:
-            r1:
-            x2:
-            y2:
-            r2:
-            choice:
-
-        Returns:
-
         """
         d = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         x, y = np.nan, np.nan
@@ -168,8 +162,6 @@ class Pintograph:
             return x, y
 
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        if save:
-            save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
         utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
 
     def display(self):

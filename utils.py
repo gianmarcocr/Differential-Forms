@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
+from typing import Union
+import os
+from datetime import datetime
+
+
 
 def pol2cart(rho, theta):
     x = rho * np.cos(theta)
@@ -36,27 +41,44 @@ def fig2img(fig):
     return img
 
 
-def plot_drawing(draw, save_path=None, bc="w", lc="k", lw=1.0):
-    x = draw.x
-    y = draw.y
-    metadata = draw.get_metadata()
+def plot_drawing(draw: Union[object, list], save: bool = False, bc="w", lc="k", lw=1.0):
+    """
+    plot single or multiple curves
+    Args:
+        draw:
+        save:
+        bc:
+        lc:
+        lw:
+
+    Returns:
+
+    """
+    # metadata = draw.get_metadata()
 
     fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(111)
-
     fig.patch.set_facecolor(bc)  # remove this to remove background
 
+    if isinstance(draw, list):
+        for c in draw:
+            ax.plot(c.x, c.y, color=lc, linewidth=lw)
+    elif hasattr(draw, "x") and hasattr(draw, "y"):
+        ax.plot(draw.x, draw.y, color=lc, linewidth=lw)
+    else:
+        raise "The curve is neither a list nor has x and y attributes"
 
-    ax.plot(x, y, color=lc, linewidth=lw)
     ax.axis('off')
     plt.tight_layout()
     plt.show()
-    if save_path:
+    if save:
+        save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
         fig.savefig(save_path, facecolor=fig.get_facecolor(), dpi=300)
-        img = fig2img(fig)  # TODO fix file extension
-        meta = PngInfo()
-        meta.add_text(draw.__class__.__name__, metadata)  # TODO fix metadata
+        # img = fig2img(fig)  # TODO fix file extension
+        # meta = PngInfo()
+        # meta.add_text(draw.__class__.__name__, metadata)  # TODO fix metadata
         # img.save(save_path, pnginfo=meta)
+
 
 def parse_metadata(data):
     # result = result or dict()
