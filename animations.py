@@ -2,7 +2,7 @@ import matplotlib
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 import os
 import utils
@@ -37,7 +37,7 @@ dist = max(np.sqrt((pintograph.x - x_rot) ** 2 + (pintograph.y - y_rot) ** 2))
 
 class Anim:
     def __init__(self):
-        fig = plt.figure(figsize=(5, 5))
+        fig = plt.figure(figsize=(10.8, 10.8))
         ax = fig.add_subplot(111, aspect="equal")
         max_x, min_x = x_rot + dist, x_rot - dist
         max_y, min_y = y_rot + dist, y_rot - dist
@@ -54,9 +54,14 @@ class Anim:
 
         self.ani = animation.FuncAnimation(fig, self.animate, interval=0, blit=True,
                                            frames=tqdm(range(len(phasor1.x)), desc="Plotting animation"),
-                                           repeat_delay=5000)
+                                           repeat_delay=5000,
+                                           )
         self.paused = False
+        # writer = animation.FFMpegWriter(fps=30, bitrate=-1)
 
+        # self.ani.save(os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.mov",
+        #               fps=60,
+        #               dpi=200)
         fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
 
     def animate(self, i):
@@ -103,8 +108,6 @@ class Anim:
 #
 # or
 #
-# writer = animation.FFMpegWriter(
-#     fps=30, metadata=dict(artist='Me'), bitrate=100)
-# ani.save("movie.mp4", writer=writer)
+
 pa = Anim()
-plt.show()
+# plt.show()
