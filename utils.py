@@ -5,7 +5,9 @@ from PIL.PngImagePlugin import PngInfo
 from typing import Union
 import os
 from datetime import datetime
+from tqdm import tqdm
 
+from drawings.Phasor import Pintograph
 
 
 def pol2cart(rho, theta):
@@ -28,7 +30,7 @@ def translate_curve(x, y, time, v_x, v_y):
 
 
 def timeline(t_max: int, dt: float, t_min: int = 0) -> object:
-    return np.arange(t_min, t_max+1, dt)
+    return np.arange(t_min, t_max + 1, dt)
 
 
 def fig2img(fig):
@@ -91,4 +93,46 @@ def parse_metadata(data):
     return
 
 
+def rotate_live(curve, x_rot: float, y_rot: float):
+    """
+    Compute rotated curve for each timestamp
+    Args:
+        curve:
+        x_rot:
+        y_rot:
 
+    Returns:
+
+    """
+    assert hasattr(curve, "x") & hasattr(curve, "y") & hasattr(curve, "t"), print("Curve has the correct attributes")
+
+    curve_rotated = [np.asarray([[curve.x[0], curve.y[0]]])]
+    t_max = curve.t[-1]
+    dt = curve.t[1]
+    omega = -2 * np.pi / t_max
+
+    for i in tqdm(range(1, len(curve.t)), desc="Computing rotated curve"):
+        rot_i = []
+        for j in range(i):
+            x = x_rot + np.cos(omega * dt * (i - j)) * (curve.x[j] - x_rot) - np.sin(omega * dt * (i - j)) * (
+                    curve.y[j] - y_rot)
+            y = y_rot + np.sin(omega * dt * (i - j)) * (curve.x[j] - x_rot) + np.cos(omega * dt * (i - j)) * (
+                    curve.y[j] - y_rot)
+            rot_i.append([x, y])
+        curve_rotated.append(np.asarray(rot_i))
+
+    return curve_rotated
+
+
+
+# def rot(i,j):
+#     rot_matrix = np.array([[np.cos(omega * dt * (i-j)), -np.sin(omega * dt * (i-j))],
+#                             [np.sin(omega * dt * (i-j)), np.cos(omega * dt * (i-j))]])
+#     return rot_matrix
+#
+# for i in tqdm(range(tim.shape[0])):
+#     rot_i = []
+#     for j in range(i):
+#         r = [x_rot, y_rot] + np.dot(rot(i,j), [pinto.x[j] - x_rot, pinto.x[j] - x_rot])
+#         rot_i.append(r)
+#     rotated_curve_new.append(rot_i)

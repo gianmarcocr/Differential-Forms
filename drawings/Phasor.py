@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 
 
 class Phasor:
-    def __init__(self, t_max, dt=0.1, x_cent=0, y_cent=0, radius=1, period=10, phase=0):  # TODO typing
+    def __init__(self, time, x_cent=0, y_cent=0, radius=1, period=10, phase=0):  # TODO typing
         self.x_c = x_cent
         self.y_c = y_cent
         self.r = radius
-        self.t = utils.timeline(t_min=0,t_max=t_max, dt=dt)
+        self.t = time
         self.T = period
         self.phi = phase
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
@@ -23,7 +23,6 @@ class Phasor:
     def get_metadata(self):
         phasor_meta = self.__dict__.copy()
         return str(phasor_meta)
-
 
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
         utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
@@ -77,16 +76,15 @@ def prolunga(Sx, Sy, Cx, Cy, r, choice="2"):
 
 
 class Pintograph:
-    def __init__(self, phasor1, phasor2, arm1, arm2, extension, choice="up"):
+    def __init__(self, phasor1, phasor2, arm1: float, arm2: float, extension: int = 0, choice: str = "up"):
         self.p1 = phasor1
         self.p2 = phasor2
+        self.t = phasor1.t
         self.l1 = arm1
         self.l2 = arm2
         self.u = extension
         self.choice = choice
         self.x, self.y = self.solution
-        self.save_path = os.environ["today_path"]
-        if not os.path.exists(self.save_path): os.makedirs(self.save_path)
 
     def get_metadata(self):
         pinto_meta = self.__dict__.copy()
@@ -99,7 +97,8 @@ class Pintograph:
 
     @property
     def solution(self):
-        assert len(self.p1.t) == len(self.p2.t), print(f"Phasor 1 and 2 time vectors have different lengths: {self.p1.t} != {self.p2.t}")
+        assert len(self.p1.t) == len(self.p2.t), print(
+            f"Phasor 1 and 2 time vectors have different lengths: {self.p1.t} != {self.p2.t}")
         sol_x = []
         sol_y = []
         for i in range(len(self.p1.x)):
@@ -199,4 +198,3 @@ class Pintograph:
 
     def __getitem__(self, item):
         return self.x[item], self.y[item]
-

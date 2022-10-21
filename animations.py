@@ -2,7 +2,7 @@ import matplotlib
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 import os
 import utils
@@ -27,63 +27,75 @@ r1 = 1.5 + np.sin(2 * np.pi / 20 * tim)
 r2 = 1
 x_rot, y_rot = -3, 5
 
-curve1 = Phasor(t_max=tmax, dt=dt, x_cent=0, y_cent=0, radius=r1, period=10, phase=0)
-curve2 = Phasor(t_max=tmax, dt=dt, x_cent=4, y_cent=0, radius=r2, period=5, phase=np.pi / 2)
-pinto = Pintograph(phasor1=curve1, phasor2=curve2, arm1=5, arm2=5, extension=0)
-pinto2 = Pintograph(phasor1=curve1, phasor2=curve2, arm1=5, arm2=5, extension=0)
-pinto2.rotate(-3, 5, tmax)
+phasor1 = Phasor(time=tim, x_cent=0, y_cent=0, radius=r1, period=10, phase=0)
+phasor2 = Phasor(time=tim, x_cent=4, y_cent=0, radius=r2, period=5, phase=np.pi / 2)
+pintograph = Pintograph(phasor1=phasor1, phasor2=phasor2, arm1=5, arm2=5, extension=0)
+rotated_pinto = utils.rotate_live(pintograph, x_rot, y_rot)
 
-dist = max(np.sqrt((pinto.x - x_rot) ** 2 + (pinto.y - y_rot) ** 2))
-
-fig = plt.figure(figsize=(5, 5))
-ax = fig.add_subplot(111, aspect="equal")
-# max_x, min_x = max(curve1.x.max(), curve2.x.max(), pinto2.x.max()), min(curve1.x.min(), curve2.x.min(), pinto2.x.min())
-# max_y, min_y = max(curve1.y.max(), curve2.y.max(), pinto2.y.max()), min(curve1.y.min(), curve2.y.min(), pinto2.y.min())
-max_x, min_x = x_rot + dist, x_rot - dist
-max_y, min_y = y_rot + dist, y_rot - dist
-ax.set(xlim=(min_x - 0.1, max_x + 0.1), ylim=(min_y - 0.1, max_y + 0.1))
-ax.axis('off')
-
-c1, = ax.plot(curve1.x, curve1.y, c="k", lw=0.5)
-c2, = ax.plot(curve2.x, curve2.y, c="k", lw=0.5)
-fasore1, = ax.plot(curve1.x[0], curve1.y[0], marker="o")
-fasore2, = ax.plot(curve2.x[0], curve2.y[0], marker="o")
-pint1, = ax.plot(pinto.x[0], pinto.y[0])
-pint2, = ax.plot(pinto.x[0], pinto.y[0])
-arm1, = ax.plot([curve1.x[0], pinto.x[0]], [curve1.y[0], pinto.y[0]])
-arm2, = ax.plot([curve2.x[0], pinto.x[0]], [curve2.y[0], pinto.y[0]])
+dist = max(np.sqrt((pintograph.x - x_rot) ** 2 + (pintograph.y - y_rot) ** 2))
 
 
-def animate(i):
-    c1.set_data(curve1.x[:i], curve1.y[:i])
-    c2.set_data(curve2.x[:i], curve2.y[:i])
+class Anim:
+    def __init__(self):
+        fig = plt.figure(figsize=(5, 5))
+        ax = fig.add_subplot(111, aspect="equal")
+        max_x, min_x = x_rot + dist, x_rot - dist
+        max_y, min_y = y_rot + dist, y_rot - dist
+        ax.set(xlim=(min_x - 0.1, max_x + 0.1), ylim=(min_y - 0.1, max_y + 0.1))
+        ax.axis('off')
 
-    # c1.set_alpha(max(1-i/(tmax/2),0))
-    # c2.set_alpha(max(1-i/(tmax/2),0))
-    fasore1.set_data(curve1.x[i], curve1.y[i])  # update the data.
-    fasore1.set_color("k")  # np.random.rand(3,)
-    fasore2.set_data(curve2.x[i], curve2.y[i])
-    fasore2.set_color("k")
-    pint1.set_data(pinto.x[:i], pinto.y[:i])
-    omega = -2 * np.pi / tmax
-    qx = []
-    qy = []
-    for j in range(i):
-        qx.append(x_rot + np.cos(omega * dt * (i - j)) * (pinto.x[j] - x_rot) - np.sin(omega * dt * (i - j)) * (
-                pinto.y[j] - y_rot))
-        qy.append(y_rot + np.sin(omega * dt * (i - j)) * (pinto.x[j] - x_rot) + np.cos(omega * dt * (i - j)) * (
-                pinto.y[j] - y_rot))
-    pint2.set_data(qx, qy)
-    arm1.set_data([curve1.x[i], pinto.x[i]], [curve1.y[i], pinto.y[i]])
-    arm2.set_data([curve2.x[i], pinto.x[i]], [curve2.y[i], pinto.y[i]])
+        self.circle1, = ax.plot(phasor1.x, phasor1.y, c="k", lw=0.5)  # first circle
+        self.circle2, = ax.plot(phasor2.x, phasor2.y, c="k", lw=0.5)  # second circle
+        self.fasore1, = ax.plot(phasor1.x[0], phasor1.y[0], marker="o")  # first phasor
+        self.fasore2, = ax.plot(phasor2.x[0], phasor2.y[0], marker="o")  # second phasor
+        self.pint, = ax.plot(pintograph.x[0], pintograph.y[0])  # pintograph
+        self.arm1, = ax.plot([phasor1.x[0], pintograph.x[0]], [phasor1.y[0], pintograph.y[0]])  # first arm
+        self.arm2, = ax.plot([phasor2.x[0], pintograph.x[0]], [phasor2.y[0], pintograph.y[0]])  # second arm
 
-    pint1.set_alpha(0)
+        self.ani = animation.FuncAnimation(fig, self.animate, interval=0, blit=True,
+                                           frames=tqdm(range(len(phasor1.x)), desc="Plotting animation"),
+                                           repeat_delay=5000)
+        self.paused = False
 
-    return c1, c2, fasore1, fasore2, pint1, arm1, arm2, pint2  # the comma is needed here
+        fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
+
+    def animate(self, i):
+        self.circle1.set_data(phasor1.x[:i], phasor1.y[:i])
+        # self.circle1.set_alpha(max(1-i/(tmax/2),0))
+
+        self.circle2.set_data(phasor2.x[:i], phasor2.y[:i])
+        # self.circle2.set_alpha(max(1-i/(tmax/2),0))
+
+        self.fasore1.set_data(phasor1.x[i], phasor1.y[i])  # update the data.
+        self.fasore1.set_color("k")  # np.random.rand(3,)
+
+        self.fasore2.set_data(phasor2.x[i], phasor2.y[i])
+        self.fasore2.set_color("k")
+
+        self.arm1.set_data([phasor1.x[i], pintograph.x[i]], [phasor1.y[i], pintograph.y[i]])
+        self.arm2.set_data([phasor2.x[i], pintograph.x[i]], [phasor2.y[i], pintograph.y[i]])
+
+        self.pint.set_data(rotated_pinto[i][:, 0], rotated_pinto[i][:, 1])
+
+        if i == tim.shape[0]-1 :
+            self.circle1.set_alpha(0)
+            self.circle2.set_alpha(0)
+            self.arm1.set_alpha(0)
+            self.arm2.set_alpha(0)
+            self.fasore1.set_alpha(0)
+            self.fasore2.set_alpha(0)
+
+        return self.circle1, self.circle2, self.fasore1, self.fasore2, self.pint, self.arm1, self.arm2,  # the comma is needed here
+
+    def toggle_pause(self, *args, **kwargs):
+        if self.paused:
+            self.ani.resume()
+        else:
+            self.ani.pause()
+        self.paused = not self.paused
 
 
-ani = animation.FuncAnimation(fig, animate, interval=0, blit=False, frames=tqdm(range(len(curve1.x))))
-#ani.save('test.gif', fps=60)
+# ani.save('test.gif', fps=60)
 
 # To save the animation, use e.g.
 #
@@ -94,5 +106,5 @@ ani = animation.FuncAnimation(fig, animate, interval=0, blit=False, frames=tqdm(
 # writer = animation.FFMpegWriter(
 #     fps=30, metadata=dict(artist='Me'), bitrate=100)
 # ani.save("movie.mp4", writer=writer)
-
+pa = Anim()
 plt.show()
