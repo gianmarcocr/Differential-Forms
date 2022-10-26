@@ -19,20 +19,23 @@ today_path = draw_path / date.today().strftime("%d-%m-%y")
 today_path.mkdir(exist_ok=True)
 os.environ["today_path"] = str(today_path)
 
-tmax = 200
-dt = 0.1
+tmax = 100
+dt = 1
 tim = utils.timeline(t_max=tmax, dt=dt)
+u=tim/tmax
 
 r1 = 1.5 + np.sin(2 * np.pi / 20 * tim)
 r2 = 1
 x_rot, y_rot = -3, 5
 
-phasor1 = Phasor(time=tim, x_cent=0, y_cent=0, radius=r1, period=10, phase=0)
-phasor2 = Phasor(time=tim, x_cent=4, y_cent=0, radius=r2, period=5, phase=np.pi / 2)
-pintograph = Pintograph(phasor1=phasor1, phasor2=phasor2, arm1=5, arm2=5, extension=0)
-rotated_pinto = utils.rotate_live(pintograph, x_rot, y_rot)
+phasor1 = curve1 = Phasor(tim, x_cent=0, y_cent=0, radius=r1, period=50, phase=0)
+phasor2 =  Phasor(tim, x_cent=curve1.x, y_cent=curve1.y, radius=r2, period=-5-20*u, phase=0*np.pi*tim/100)
+# pintograph = Pintograph(phasor1=phasor1, phasor2=phasor2, arm1=5, arm2=5, extension=0)
 
-dist = max(np.sqrt((pintograph.x - x_rot) ** 2 + (pintograph.y - y_rot) ** 2))
+curva = phasor2
+
+scia = utils.rotate_live(curva, x_rot, y_rot)
+dist = max(np.sqrt((curva.x - x_rot) ** 2 + (curva.y - y_rot) ** 2))
 
 
 class Anim:
@@ -48,16 +51,17 @@ class Anim:
         self.circle2, = ax.plot(phasor2.x, phasor2.y, c="k", lw=0.5)  # second circle
         self.fasore1, = ax.plot(phasor1.x[0], phasor1.y[0], marker="o")  # first phasor
         self.fasore2, = ax.plot(phasor2.x[0], phasor2.y[0], marker="o")  # second phasor
-        self.pint, = ax.plot(pintograph.x[0], pintograph.y[0])  # pintograph
-        self.arm1, = ax.plot([phasor1.x[0], pintograph.x[0]], [phasor1.y[0], pintograph.y[0]])  # first arm
-        self.arm2, = ax.plot([phasor2.x[0], pintograph.x[0]], [phasor2.y[0], pintograph.y[0]])  # second arm
+
+        self.scia, = ax.plot(curva.x[0], curva.y[0])  # second phasor
+        # self.pint, = ax.plot(pintograph.x[0], pintograph.y[0])  # pintograph
+        # self.arm1, = ax.plot([phasor1.x[0], pintograph.x[0]], [phasor1.y[0], pintograph.y[0]])  # first arm
+        # self.arm2, = ax.plot([phasor2.x[0], pintograph.x[0]], [phasor2.y[0], pintograph.y[0]])  # second arm
 
         self.ani = animation.FuncAnimation(fig, self.animate, interval=0, blit=True,
                                            frames=tqdm(range(len(phasor1.x)), desc="Plotting animation"),
                                            repeat_delay=5000,
                                            )
         self.paused = False
-        # writer = animation.FFMpegWriter(fps=30, bitrate=-1)
 
         # self.ani.save(os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.mov",
         #               fps=60,
@@ -77,20 +81,23 @@ class Anim:
         self.fasore2.set_data(phasor2.x[i], phasor2.y[i])
         self.fasore2.set_color("k")
 
-        self.arm1.set_data([phasor1.x[i], pintograph.x[i]], [phasor1.y[i], pintograph.y[i]])
-        self.arm2.set_data([phasor2.x[i], pintograph.x[i]], [phasor2.y[i], pintograph.y[i]])
+        # self.scia.set_data(scia.x[i], scia.y[i])
+        # self.scia.set_color("r")
+        # self.arm1.set_data([phasor1.x[i], pintograph.x[i]], [phasor1.y[i], pintograph.y[i]])
+        # self.arm2.set_data([phasor2.x[i], pintograph.x[i]], [phasor2.y[i], pintograph.y[i]])
 
-        self.pint.set_data(rotated_pinto[i][:, 0], rotated_pinto[i][:, 1])
+        self.scia.set_data(scia[i][:, 0], scia[i][:, 1])
+        self.scia.set_color("r")
 
         if i == tim.shape[0]-1 :
             self.circle1.set_alpha(0)
             self.circle2.set_alpha(0)
-            self.arm1.set_alpha(0)
-            self.arm2.set_alpha(0)
+            # self.arm1.set_alpha(0)
+            # self.arm2.set_alpha(0)
             self.fasore1.set_alpha(0)
             self.fasore2.set_alpha(0)
 
-        return self.circle1, self.circle2, self.fasore1, self.fasore2, self.pint, self.arm1, self.arm2,  # the comma is needed here
+        return self.circle1, self.circle2, self.fasore1, self.fasore2, self.scia # self.pint, self.arm1, self.arm2,  # the comma is needed here
 
     def toggle_pause(self, *args, **kwargs):
         if self.paused:
@@ -110,4 +117,4 @@ class Anim:
 #
 
 pa = Anim()
-# plt.show()
+plt.show()

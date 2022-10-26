@@ -7,9 +7,6 @@ import os
 from datetime import datetime
 from tqdm import tqdm
 
-from drawings.Phasor import Pintograph
-
-
 def pol2cart(rho, theta):
     x = rho * np.cos(theta)
     y = rho * np.sin(theta)
