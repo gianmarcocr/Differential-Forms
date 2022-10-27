@@ -57,6 +57,9 @@ class Anim:
         self.arm1, = ax.plot([A.x_c, A.x[0]], [A.y_c, A.y[0]], c="k", lw=0.5)  # first arm
         self.arm2, = ax.plot([A.y[0], B.x[0]], [A.y[1], B.y[0]], c="k", lw=0.5)  # second arm
 
+        # self.cerchio1, = plt.Circle((A.x_c[0], A.y_c[0]), r1[0], c="r--")
+        # self.cerchio1, = plt.Circle((B.x_c[0], B.y_c[0]), r2[0], c="b--")
+
         self.ani = animation.FuncAnimation(fig, self.animate, interval=0, blit=True,
                                            frames=tqdm(range(len(A.x)), desc="Plotting animation"),
                                            repeat_delay=3000,
@@ -88,6 +91,9 @@ class Anim:
         self.scia.set_data(scia[i][:i, 0], scia[i][:i, 1])
         # self.scia.set_color("r")
 
+        # self.cerchio1.set_data((A.x_c[i], A.y_c[i]), r1[i] )
+        # self.cerchio1.set_data((B.x_c[i], B.y_c[i]), r2[i])
+
         if i == tim.shape[0]-1:
             self.point1.set_alpha(0)
             self.point2.set_alpha(0)
@@ -96,7 +102,7 @@ class Anim:
             self.marker1.set_alpha(0)
             self.marker2.set_alpha(0)
 
-        return self.point1, self.point2, self.marker1, self.marker2, self.scia, self.arm1, self.arm2 # self.pint, self.arm1, self.arm2,  # the comma is needed here
+        return self.point1, self.point2, self.marker1, self.marker2, self.scia, self.arm1, self.arm2, self.cerchio1, self.cerchio2 # self.pint, self.arm1, self.arm2,  # the comma is needed here
 
     def toggle_pause(self, *args, **kwargs):
         if self.paused:

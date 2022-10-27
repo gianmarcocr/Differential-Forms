@@ -90,7 +90,7 @@ def parse_metadata(data):
     return
 
 
-def rotate_live(curve, x_rot: float, y_rot: float, T):
+def rotate_live(curve, x_rot: float, y_rot: float, T: float):
     """
     Compute rotated curve for each timestamp
     Args:
