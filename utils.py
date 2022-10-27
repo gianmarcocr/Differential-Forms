@@ -6,6 +6,8 @@ from typing import Union
 import os
 from datetime import datetime
 from tqdm import tqdm
+from drawings.Curve import Curve
+
 
 def pol2cart(rho, theta):
     x = rho * np.cos(theta)
@@ -40,10 +42,12 @@ def fig2img(fig):
     return img
 
 
-def plot_drawing(draw: Union[object, list], save: bool = False, bc="w", lc="k", lw=1.0):
+def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", lc: str = "k", lw: float = 1.0,
+                 show: bool = True):
     """
     plot single or multiple curves
     Args:
+        show:
         draw:
         save:
         bc:
@@ -56,22 +60,30 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc="w", lc="k", 
     # metadata = draw.get_metadata()
 
     fig = plt.figure(figsize=(20, 20))
-    ax = fig.add_subplot(111)
+    ax = fig.add_subplot(111, aspect="equal")
     fig.patch.set_facecolor(bc)  # remove this to remove background
 
     if isinstance(draw, list):
         for c in draw:
             ax.plot(c.x, c.y, color=lc, linewidth=lw)
     elif hasattr(draw, "x") and hasattr(draw, "y"):
+        # from matplotlib.lines import Line2D
+        # line = Line2D(draw.x, draw.y, color="k", linewidth=lw)  # it works or not??
+        # ax.add_line(line)
         ax.plot(draw.x, draw.y, color=lc, linewidth=lw)
     else:
         raise "The curve is neither a list nor has x and y attributes"
 
+    ax.set_xlim(max(draw.x), min(draw.x))
+    ax.set_ylim(max(draw.y), min(draw.y))
     ax.axis('off')
     plt.tight_layout()
-    plt.show()
+
+    if show:
+        plt.show()
+
     if save:
-        save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
+        save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.svg"
         fig.savefig(save_path, facecolor=fig.get_facecolor(), dpi=300)
         # img = fig2img(fig)  # TODO fix file extension
         # meta = PngInfo()
@@ -102,26 +114,39 @@ def rotate_live(curve, x_rot: float, y_rot: float, T: float):
     Returns:
 
     """
-    assert hasattr(curve, "x") & hasattr(curve, "y") & hasattr(curve, "t"), print("Curve has the correct attributes")
+    assert hasattr(curve, "x") & hasattr(curve, "y") & hasattr(curve, "t"), print(
+        "Curve doesn't have the correct attributes")
 
-    curve_rotated = [np.asarray([[curve.x[0], curve.y[0]]])]
-    t_max = curve.t[-1]
+    curve_rotated = [Curve(time=curve.t[0], x=[curve.x[0]], y=[curve.y[0]])]
     dt = curve.t[1]
     omega = -2 * np.pi / T
 
     for i in tqdm(range(1, len(curve.t)), desc="Computing rotated curve"):
-        rot_i = []
+        rot_x_i = []
+        rot_y_i = []
         for j in range(i):
             x = x_rot + np.cos(omega * dt * (i - j)) * (curve.x[j] - x_rot) - np.sin(omega * dt * (i - j)) * (
                     curve.y[j] - y_rot)
             y = y_rot + np.sin(omega * dt * (i - j)) * (curve.x[j] - x_rot) + np.cos(omega * dt * (i - j)) * (
                     curve.y[j] - y_rot)
-            rot_i.append([x, y])
-        curve_rotated.append(np.asarray(rot_i))
+            rot_x_i.append(x)
+            rot_y_i.append(y)
+        curve_rotated.append(Curve(time=curve.t[:i], x=rot_x_i, y=rot_y_i))
 
     return curve_rotated
 
 
+def sigmoid(x, a: float = 1, b: float = 0):
+    """
+    Args:
+        x: point where to compute sigmoid
+        a: increase steepness
+        b: translate sigmoid fest or right
+
+    Returns: 1/(1+e^(ax+b)
+
+    """
+    return 1 / (1 + np.exp(a * x + b))
 
 # def rot(i,j):
 #     rot_matrix = np.array([[np.cos(omega * dt * (i-j)), -np.sin(omega * dt * (i-j))],

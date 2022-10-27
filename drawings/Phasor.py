@@ -1,12 +1,12 @@
 import numpy as np
 import utils
-import os
 import warnings
 import matplotlib.pyplot as plt
 
 
 class Phasor:
-    def __init__(self, time, x_cent=0, y_cent=0, radius=1, period=10, phase=0):  # TODO typing
+    def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1, period: float = 10,
+                 phase: float = 0):
         self.x_c = x_cent
         self.y_c = y_cent
         self.r = radius
@@ -16,9 +16,6 @@ class Phasor:
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
         self.y = self.y_c + self.r * np.sin((2 * np.pi / self.T) * self.t + self.phi)
 
-    # def __make_coord(self):
-    #
-    #     return np.column_stack((x, y))
 
     def get_metadata(self):
         phasor_meta = self.__dict__.copy()
