@@ -90,13 +90,14 @@ def parse_metadata(data):
     return
 
 
-def rotate_live(curve, x_rot: float, y_rot: float):
+def rotate_live(curve, x_rot: float, y_rot: float, T):
     """
     Compute rotated curve for each timestamp
     Args:
         curve:
         x_rot:
         y_rot:
+        T:
 
     Returns:
 
@@ -106,7 +107,7 @@ def rotate_live(curve, x_rot: float, y_rot: float):
     curve_rotated = [np.asarray([[curve.x[0], curve.y[0]]])]
     t_max = curve.t[-1]
     dt = curve.t[1]
-    omega = -2 * np.pi / t_max
+    omega = -2 * np.pi / T
 
     for i in tqdm(range(1, len(curve.t)), desc="Computing rotated curve"):
         rot_i = []
