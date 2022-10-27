@@ -7,8 +7,6 @@ import os
 from datetime import datetime
 from tqdm import tqdm
 
-from drawings.Phasor import Pintograph
-
 
 def pol2cart(rho, theta):
     x = rho * np.cos(theta)
@@ -93,7 +91,7 @@ def parse_metadata(data):
     return
 
 
-def rotate_live(curve, x_rot: float, y_rot: float):
+def rotate_live(curve, x_rot: float, y_rot: float, T: float):
     """
     Compute rotated curve for each timestamp
     Args:
@@ -107,9 +105,9 @@ def rotate_live(curve, x_rot: float, y_rot: float):
     assert hasattr(curve, "x") & hasattr(curve, "y") & hasattr(curve, "t"), print("Curve has the correct attributes")
 
     curve_rotated = [np.asarray([[curve.x[0], curve.y[0]]])]
-    t_max = curve.t[-1]
+    # t_max = curve.t[-1]
     dt = curve.t[1]
-    omega = -2 * np.pi / t_max
+    omega = -2 * np.pi / T
 
     for i in tqdm(range(1, len(curve.t)), desc="Computing rotated curve"):
         rot_i = []
