@@ -16,25 +16,27 @@ today_path = draw_path / date.today().strftime("%d-%m-%y")
 today_path.mkdir(exist_ok=True)
 os.environ["today_path"] = str(today_path)
 
-k = 1  # scale factor
+k = 0.7  # scale factor
 
 tmax = 300
-dt = 1
-tim = utils.timeline(t_max=tmax, dt=dt)
-u = tim / tmax
+dt = 0.1
+x_rot, y_rot = -0.7, -0.5
+T_foglio = -3000
 
-r1 = 5 * np.sqrt(u)
-r2 = 0 + np.sin(np.pi * u) ** 2
-x_rot, y_rot = -6, 5
+tim = utils.timeline(t_max=tmax, dt=dt)
+u = tim / tmax # normalized time
+
+r1 = 4 * np.sqrt(u+0.3)
+r2 = 1.3 * np.sin(np.pi * u) ** 2
 
 # FASORE SU FASORE - B sopra ad A
-A = Phasor(tim, x_cent=0, y_cent=0, radius=r1, period=300, phase=0)
-B = Phasor(tim, x_cent=A.x, y_cent=A.y, radius=r2, period=-4, phase=0)
+A = Phasor(tim, x_cent=0, y_cent=0, radius=r1, period=170, phase=0)
+B = Phasor(tim, x_cent=A.x, y_cent=A.y, radius=r2, period=3, phase=0)
 # pintograph = Pintograph(phasor1=phasor1, phasor2=phasor2, arm1=5, arm2=5, extension=0)
 
 
 curva = B
-scia = utils.rotate_live(curva, x_rot, y_rot, T=2 / 3 * tmax)
+scia = utils.rotate_live(curva, x_rot, y_rot, T=T_foglio)
 dist = max(np.sqrt((curva.x - x_rot) ** 2 + (curva.y - y_rot) ** 2))
 
 
@@ -47,6 +49,7 @@ class Anim:
         max_y, min_y = y_rot + dist, y_rot - dist
         ax.set(xlim=(min_x - 0.1, max_x + 0.1), ylim=(min_y - 0.1, max_y + 0.1))
         ax.axis('off')
+        self.pivot = ax.plot(x_rot,y_rot, c="k", marker=".")   # pivot for rotation
 
         self.point1, = ax.plot(A.x[0], A.y[0], c="k", lw=0.3)  # first point
         self.point2, = ax.plot(B.x[0], B.y[0], c="k", lw=0.3)  # second point
@@ -55,7 +58,7 @@ class Anim:
         self.marker2, = ax.plot(B.x[0], B.y[0], c="k", marker="o", ms=2, alpha=1)  # second marker
 
         scia_in = scia[0]
-        self.scia, = ax.plot([scia_in.x, scia_in.y], lw=0.5)
+        self.scia, = ax.plot([scia_in.x, scia_in.y], lw=0.8)
 
         self.arm1, = ax.plot([A.x_c, A.x[0]], [A.y_c, A.y[0]], c="k", lw=0.5)  # first arm
         self.arm2, = ax.plot([A.y[0], B.x[0]], [A.y[1], B.y[0]], c="k", lw=0.5)  # second arm
@@ -96,7 +99,7 @@ class Anim:
         self.scia.set_data(scia_i.x[:i], scia_i.y[:i])
         # self.scia.set_color("r")
 
-        alpha = utils.sigmoid(i, a=.7, b=-tmax * 3 / 5)
+        alpha = utils.sigmoid(i, a=.7, b=-100 * 3 / 5)
         self.point1.set_alpha(alpha)
         self.point2.set_alpha(alpha)
         self.arm1.set_alpha(alpha)
