@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from PIL.PngImagePlugin import PngInfo
+# from PIL.PngImagePlugin import PngInfo
 from typing import Union
 import os
 from datetime import datetime
@@ -74,8 +74,8 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
     else:
         raise "The curve is neither a list nor has x and y attributes"
 
-    ax.set_xlim(max(draw.x), min(draw.x))
-    ax.set_ylim(max(draw.y), min(draw.y))
+    ax.set_xlim(max(draw.x) + 0.1, min(draw.x) - 0.1)
+    ax.set_ylim(max(draw.y) + 0.1, min(draw.y) - 0.1)
     ax.axis('off')
     plt.tight_layout()
 
@@ -83,8 +83,11 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
         plt.show()
 
     if save:
-        save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.svg"
-        fig.savefig(save_path, facecolor=fig.get_facecolor(), dpi=300)
+        save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}"
+        fig.savefig(save_path + ".svg", facecolor=fig.get_facecolor(), dpi=300)
+        fig.savefig(save_path + ".png", facecolor=fig.get_facecolor(), dpi=300)
+        plt.close()
+
         # img = fig2img(fig)  # TODO fix file extension
         # meta = PngInfo()
         # meta.add_text(draw.__class__.__name__, metadata)  # TODO fix metadata
