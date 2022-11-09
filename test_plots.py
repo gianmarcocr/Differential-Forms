@@ -36,7 +36,7 @@ B = Pendulum(tim, x_cent=A.x, y_cent=A.y, radius=3, max_angle=np.pi/4, period=tm
 
 # pintograph = Pintograph(phasor1=phasor1, phasor2=phasor2, arm1=5, arm2=5, extension=0)
 
-
+#  CACCA
 curva = B
 scia = utils.rotate_live(curva, x_rot, y_rot, T=T_foglio)
 dist = max(np.sqrt((curva.x - x_rot) ** 2 + (curva.y - y_rot) ** 2))
