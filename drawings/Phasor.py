@@ -90,8 +90,8 @@ class Pendulum:
 
     """
 
-    def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1, max_angle: float = np.pi/6,
-                 period: float = 10, phase: float = 0
+    def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1,
+                 max_angle: float = np.pi/6, period: float = 10, phase: float = 0
                  ):
         self.x_c = x_cent
         self.y_c = y_cent
