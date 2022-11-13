@@ -1,39 +1,40 @@
 import numpy as np
 import utils
-import os
-from datetime import datetime
 import warnings
 import matplotlib.pyplot as plt
 
 
 class Phasor:
-    def __init__(self, t_max, dt=0.1, x_cent=0, y_cent=0, radius=1, period=10, phase=0):  # TODO typing
+    def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1, period: float = 10,
+                 phase: float = 0):
         self.x_c = x_cent
         self.y_c = y_cent
         self.r = radius
-        self.t = utils.timeline(t_max=t_max, dt=dt)
+        self.t = time
         self.T = period
         self.phi = phase
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
         self.y = self.y_c + self.r * np.sin((2 * np.pi / self.T) * self.t + self.phi)
-        self.save_path = os.environ["today_path"]
-        if not os.path.exists(self.save_path): os.makedirs(self.save_path)  # TODO fix all this path situation
 
-    # def __make_coord(self):
-    #
-    #     return np.column_stack((x, y))
 
     def get_metadata(self):
         phasor_meta = self.__dict__.copy()
         return str(phasor_meta)
 
+    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
+        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
+
+    def rotate(self, x_rot, y_rot, t_background):
+        self.x, self.y = utils.rotate_curve(self.x, self.y, self.t, x_rot=x_rot, y_rot=y_rot,
+                                            t_background=t_background)
+        return self
+
+    def translate(self, v_x, v_y):
+        self.x, self.y = utils.translate_curve(self.x, self.y, self.t, v_x=v_x, v_y=v_y)
+        return self
+
     def __getitem__(self, item):
         return self.x[item], self.y[item]
-
-    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        if save:
-            save = self.save_path + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
-        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
 
 
 def line_from_points(p, q):
@@ -70,18 +71,72 @@ def prolunga(Sx, Sy, Cx, Cy, r, choice="2"):
         sol.append(linecircle(Cx[i], Cy[i], r, m, q, choice))
     return np.asarray(sol)
 
+class Pendulum:
+    """
+        Builds a "pendulum".
+
+        Args:
+            x_cent, y_cent: center coordinates
+            radius: pendulum radius
+            max_angle: half of the maximum aperture of the pendulum (rad)
+            period: period of oscillation
+            phase: direction of equilibrium (rad)
+
+            x(t) = x_c + r * cos(alpha + phase)
+            y(t) = y_c + r * sin(max_angle*alpha + phase)
+            alpha(t) = 2pi/T * t
+
+        Returns:
+
+    """
+
+    def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1,
+                 max_angle: float = np.pi/6, period: float = 10, phase: float = 0
+                 ):
+        self.x_c = x_cent
+        self.y_c = y_cent
+        self.r = radius
+        self.t = time
+        self.T = period
+        self.max_angle = max_angle
+        self.phi = phase
+
+        self.omega = 2*np.pi/self.T
+        self.alpha = self.max_angle * np.sin(self.omega * self.t)
+        self.x = self.x_c + self.r * np.cos(self.alpha + self.phi)
+        self.y = self.y_c + self.r * np.sin(self.alpha + self.phi)
+
+
+    def get_metadata(self):
+        phasor_meta = self.__dict__.copy()
+        return str(phasor_meta)
+
+    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
+        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
+
+    def rotate(self, x_rot, y_rot, t_background):
+        self.x, self.y = utils.rotate_curve(self.x, self.y, self.t, x_rot=x_rot, y_rot=y_rot,
+                                            t_background=t_background)
+        return self
+
+    def translate(self, v_x, v_y):
+        self.x, self.y = utils.translate_curve(self.x, self.y, self.t, v_x=v_x, v_y=v_y)
+        return self
+
+    def __getitem__(self, item):
+        return self.x[item], self.y[item]
+
 
 class Pintograph:
-    def __init__(self, phasor1, phasor2, arm1, arm2, extension, choice="up"):
+    def __init__(self, phasor1, phasor2, arm1: float, arm2: float, extension: int = 0, choice: str = "up"):
         self.p1 = phasor1
         self.p2 = phasor2
+        self.t = phasor1.t
         self.l1 = arm1
         self.l2 = arm2
         self.u = extension
         self.choice = choice
         self.x, self.y = self.solution
-        self.save_path = os.environ["today_path"]
-        if not os.path.exists(self.save_path): os.makedirs(self.save_path)
 
     def get_metadata(self):
         pinto_meta = self.__dict__.copy()
@@ -94,7 +149,8 @@ class Pintograph:
 
     @property
     def solution(self):
-        assert len(self.p1.t) == len(self.p2.t), print(f"Phasor 1 and 2 time vectors have different lengths: {self.p1.t} != {self.p2.t}")
+        assert len(self.p1.t) == len(self.p2.t), print(
+            f"Phasor 1 and 2 time vectors have different lengths: {self.p1.t} != {self.p2.t}")
         sol_x = []
         sol_y = []
         for i in range(len(self.p1.x)):
@@ -117,17 +173,6 @@ class Pintograph:
     def intersection(x1, y1, r1, x2, y2, r2, choice):
         """
         source: https://stackoverflow.com/questions/55816902/finding-the-intersection-of-two-circles
-        Args:
-            x1:
-            y1:
-            r1:
-            x2:
-            y2:
-            r2:
-            choice:
-
-        Returns:
-
         """
         d = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         x, y = np.nan, np.nan
@@ -168,8 +213,6 @@ class Pintograph:
             return x, y
 
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        if save:
-            save = self.save_path + f"{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.png"
         utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
 
     def display(self):
@@ -207,4 +250,3 @@ class Pintograph:
 
     def __getitem__(self, item):
         return self.x[item], self.y[item]
-

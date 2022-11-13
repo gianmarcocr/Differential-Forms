@@ -1,20 +1,15 @@
-from typing import Union
 import utils
-import numpy as np
 
-class Lissajous:
-    def __init__(self, time, x_period: Union[float, int], y_period: Union[float, int],
-                 phase: float = 0):
+
+class Curve:
+    def __init__(self, time, x, y):
         self.t = time
-        self.phi = phase
-        self.T_x = x_period
-        self.T_y = y_period
-        self.x = np.cos(2 * np.pi / self.T_x * self.t + self.phi)
-        self.y = np.sin(2 * np.pi / self.T_y * self.t + self.phi)
+        self.x = x
+        self.y = y
 
     def get_metadata(self):
-        liss_meta = self.__dict__.copy()
-        return str(liss_meta)
+        curve_meta = self.__dict__.copy()
+        return str(curve_meta)
 
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
         utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
@@ -30,4 +25,3 @@ class Lissajous:
 
     def __getitem__(self, item):
         return self.x[item], self.y[item]
-
