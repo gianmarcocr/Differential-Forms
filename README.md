@@ -17,7 +17,7 @@ git clone https://github.com/gianmarcocr/Differential-Forms.git
 Move to your directory and setup a virtual env:
 ```bash
 python -m venv venv
-venv/bin/activate
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -29,4 +29,4 @@ pip install -r requirements.txt
 - [x] Parameters dump;
 - [ ] Move to abstract class;
 - [x] Jupyter Notebook;
-- [ ] Move to lines instead of points
+- [x] Move to lines instead of points

@@ -64,13 +64,14 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
     fig.patch.set_facecolor(bc)  # remove this to remove background
 
     if isinstance(draw, list):
-        for c in draw:
-            ax.plot(c.x, c.y, color=lc, linewidth=lw)
+        for d in draw:
+            ax.plot(d.x, d.y, color=lc, linewidth=lw)
     elif hasattr(draw, "x") and hasattr(draw, "y"):
         # from matplotlib.lines import Line2D
         # line = Line2D(draw.x, draw.y, color="k", linewidth=lw)  # it works or not??
         # ax.add_line(line)
         ax.plot(draw.x, draw.y, color=lc, linewidth=lw)
+
     else:
         raise "The curve is neither a list nor has x and y attributes"
 
@@ -122,7 +123,7 @@ def rotate_live(curve, x_rot: float, y_rot: float, T: float):
 
     curve_rotated = [Curve(time=curve.t[0], x=[curve.x[0]], y=[curve.y[0]])]
     dt = curve.t[1]
-    omega = -2 * np.pi / T
+    omega = 0 if T == 0 else -2 * np.pi / T
 
     for i in tqdm(range(1, len(curve.t)), desc="Computing rotated curve"):
         rot_x_i = []
