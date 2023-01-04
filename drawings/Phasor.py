@@ -216,7 +216,7 @@ class Pintograph:
         utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
 
     def display(self):
-        fig, ax = plt.subplots(figsize=(15, 15))
+        fig, ax = plt.subplots(figsize=(10, 10))
         alpha = 0.5
         ax.set_facecolor("white")
         ax.axis('equal')

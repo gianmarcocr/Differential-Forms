@@ -16,7 +16,7 @@ def pol2cart(rho, theta):
 
 
 def rotate_curve(x, y, time, x_rot, y_rot, t_background):
-    omega = 2 * np.pi / t_background
+    omega = 0 if t_background == 0 else 2 * np.pi / t_background
     qx = x_rot + np.cos(omega * time) * (x - x_rot) - np.sin(omega * time) * (y - y_rot)
     qy = y_rot + np.sin(omega * time) * (x - x_rot) + np.cos(omega * time) * (y - y_rot)
     return qx, qy
@@ -64,19 +64,30 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
     fig.patch.set_facecolor(bc)  # remove this to remove background
 
     if isinstance(draw, list):
+        max_x, min_x, max_y, min_y = -np.inf, np.inf, -np.inf, np.inf
         for d in draw:
             ax.plot(d.x, d.y, color=lc, linewidth=lw)
+            if max(d.x) > max_x:
+                max_x = max(d.x)
+            if min(d.x) < min_x:
+                min_x = min(d.x)
+            if max(d.y) > max_y:
+                max_y = max(d.y)
+            if min(d.y) < min_y:
+                min_y = min(d.y)
+
     elif hasattr(draw, "x") and hasattr(draw, "y"):
         # from matplotlib.lines import Line2D
         # line = Line2D(draw.x, draw.y, color="k", linewidth=lw)  # it works or not??
         # ax.add_line(line)
         ax.plot(draw.x, draw.y, color=lc, linewidth=lw)
+        max_x, min_x, max_y, min_y = max(draw.x), min(draw.x), max(draw.y), min(draw.y)
 
     else:
         raise "The curve is neither a list nor has x and y attributes"
 
-    ax.set_xlim(max(draw.x) + 0.1, min(draw.x) - 0.1)
-    ax.set_ylim(max(draw.y) + 0.1, min(draw.y) - 0.1)
+    ax.set_xlim(max_x + 0.1, min_x - 0.1)
+    ax.set_ylim(max_y + 0.1, min_y - 0.1)
     ax.axis('off')
     plt.tight_layout()
 
@@ -121,14 +132,14 @@ def rotate_live(curve, x_rot: float, y_rot: float, T: float):
     assert hasattr(curve, "x") & hasattr(curve, "y") & hasattr(curve, "t"), print(
         "Curve doesn't have the correct attributes")
 
-    curve_rotated = [Curve(time=curve.t[0], x=[curve.x[0]], y=[curve.y[0]])]
+    curve_rotated = []
     dt = curve.t[1]
     omega = 0 if T == 0 else -2 * np.pi / T
 
-    for i in tqdm(range(1, len(curve.t)), desc="Computing rotated curve"):
+    for i in tqdm(range(0, len(curve.t)), desc="Computing rotated curve"):
         rot_x_i = []
         rot_y_i = []
-        for j in range(i):
+        for j in range(i + 1):
             x = x_rot + np.cos(omega * dt * (i - j)) * (curve.x[j] - x_rot) - np.sin(omega * dt * (i - j)) * (
                     curve.y[j] - y_rot)
             y = y_rot + np.sin(omega * dt * (i - j)) * (curve.x[j] - x_rot) + np.cos(omega * dt * (i - j)) * (
