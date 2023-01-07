@@ -76,7 +76,7 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
             if min(d.y) < min_y:
                 min_y = min(d.y)
 
-    elif hasattr(draw, "x") and hasattr(draw, "y"):
+    elif hasattr(draw, "x") and hasattr(draw, "y"):  # TODO fix if else assert
         # from matplotlib.lines import Line2D
         # line = Line2D(draw.x, draw.y, color="k", linewidth=lw)  # it works or not??
         # ax.add_line(line)

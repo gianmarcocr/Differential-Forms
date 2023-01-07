@@ -17,11 +17,5 @@ class DrawingCanvas:
             self.curve_list.append(curve)
         return self
 
-    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        plot_drawing(self.curve_list, save, bc=background, lc=linecolor, lw=linewidth)
-
-
-
-
-
-
+    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0, show=True):
+        plot_drawing(self.curve_list, save, bc=background, lc=linecolor, lw=linewidth, show=show)
