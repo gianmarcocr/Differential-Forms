@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 import utils
 import warnings
@@ -220,11 +222,15 @@ class Pintograph:
         alpha = 0.5
         ax.set_facecolor("white")
         ax.axis('equal')
-        p1 = ax.plot(self.p1.x, self.p1.y, label=f'Phasor 1: r={self.p1.r} ', alpha=alpha)
+        r1_label = self.p1.r if isinstance(self.p1.r, int) or isinstance(self.p1.r, float) else [self.p1.r[i] for i in
+                                                                                                 range(3)] + ["..."]
+        p1 = ax.plot(self.p1.x, self.p1.y, label=f'Phasor 1: r={r1_label} ', alpha=alpha)
         ax.plot(self.p1.x_c, self.p1.y_c, c=p1[0].get_color(), marker="o", alpha=alpha)
         ax.plot([self.p1.x[0], self.x[0]], [self.p1.y[0], self.y[0]], 'k', label=f"Arm 1: l={self.l1}", alpha=alpha,
                 zorder=2)
-        p2 = ax.plot(self.p2.x, self.p2.y, label=f'Phasor 2: r={self.p2.r}', alpha=alpha)
+        r2_label = self.p2.r if isinstance(self.p2.r, int) or isinstance(self.p2.r, float) else [self.p2.r[i] for i in
+                                                                                                 range(3)] + ["..."]
+        p2 = ax.plot(self.p2.x, self.p2.y, label=f'Phasor 2: r={r2_label}', alpha=alpha)
         ax.plot(self.p2.x_c, self.p2.y_c, c=p2[0].get_color(), marker="o", alpha=alpha)
         ax.plot([self.p2.x[0], self.x[0]], [self.p2.y[0], self.y[0]], 'k', label=f"Arm 2: l={self.l2}", alpha=alpha,
                 zorder=2)
@@ -239,9 +245,9 @@ class Pintograph:
         ax.set_title("Pintograph")
         ax.legend()
 
-    def rotate(self, x_rot, y_rot, t_background):
+    def rotate(self, x_rot, y_rot, t_background, phase):
         self.x, self.y = utils.rotate_curve(self.x, self.y, self.p1.t, x_rot=x_rot, y_rot=y_rot,
-                                            t_background=t_background)
+                                            t_background=t_background, phi=phase)
         return self
 
     def translate(self, v_x, v_y):

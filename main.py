@@ -24,15 +24,22 @@ os.environ["today_path"] = str(today_path)
 
 if __name__ == "__main__":
     t = timeline(t_max=100, dt=0.1)
-    # curve = Lissajous(50, 0.025, np.pi, 2, 1)
-    # curve.rotate(x_rot=1, y_rot=1, t_background=2).rotate(x_rot=1, y_rot=1, t_background=2)
-    # curve.plot(save=True, background="black", linecolor="r", linewidth=2)
-    curve = Phasor(time=t, x_cent=0, y_cent=0, radius=3, period=100, phase=0)
-    curve2 = Phasor(time=t, x_cent=2, y_cent=0, radius=3, period=50, phase=np.pi/2)
-    pinto = Pintograph(phasor1=curve, phasor2=curve2, arm1=2, arm2=1.5, extension=0)
-    # pinto.display()
-    # pinto.plot(save=False)
-    canv = DrawingCanvas().add([curve, curve2])
-    canv.add(pinto)
-    canv.plot()
+    tmax = 100.000001  # to include last tmax as last value
+    dt = 0.01
 
+    pi = np.pi
+    tim = timeline(tmax, dt)
+    u = tim / tmax
+
+    T = tmax
+
+    r1 = 1.3 + np.sin(2 * pi * u * 1)
+    r2 = 1. + np.sin(2 * pi * u)
+
+    curve = Phasor(time=tim, x_cent=0, y_cent=0, radius=r1, period=1, phase=0)
+    curve2 = Phasor(time=tim, x_cent=8, y_cent=0, radius=r2, period=1, phase=0)
+    pinto = Pintograph(phasor1=curve, phasor2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0)
+    pinto1 = Pintograph(phasor1=curve, phasor2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.3)
+    pinto2 = Pintograph(phasor1=curve, phasor2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.6)
+    canv = DrawingCanvas().add([pinto, pinto1, pinto2])
+    canv.plot(linecolor=["k", "b", "r"])

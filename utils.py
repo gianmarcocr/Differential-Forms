@@ -15,14 +15,14 @@ def pol2cart(rho, theta):
     return x, y
 
 
-def rotate_curve(x, y, time, x_rot, y_rot, t_background):
+def rotate_curve(x, y, time, x_rot, y_rot, t_background: float = 0, phi: float = 0):
     omega = 0 if t_background == 0 else 2 * np.pi / t_background
-    qx = x_rot + np.cos(omega * time) * (x - x_rot) - np.sin(omega * time) * (y - y_rot)
-    qy = y_rot + np.sin(omega * time) * (x - x_rot) + np.cos(omega * time) * (y - y_rot)
+    qx = x_rot + np.cos(omega * time + phi) * (x - x_rot) - np.sin(omega * time + phi) * (y - y_rot)
+    qy = y_rot + np.sin(omega * time + phi) * (x - x_rot) + np.cos(omega * time + phi) * (y - y_rot)
     return qx, qy
 
 
-def translate_curve(x, y, time, v_x, v_y):
+def translate_curve(x, y, time, v_x: float = 0, v_y: float = 0):
     qx = x + v_x * time
     qy = y + v_y * time
     return qx, qy
@@ -42,21 +42,9 @@ def fig2img(fig):
     return img
 
 
-def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", lc: str = "k", lw: float = 1.0,
+def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", lc: Union[str, list] = "k",
+                 lw: float = 1.0,
                  show: bool = True):
-    """
-    plot single or multiple curves
-    Args:
-        show:
-        draw:
-        save:
-        bc:
-        lc:
-        lw:
-
-    Returns:
-
-    """
     # metadata = draw.get_metadata()
 
     fig = plt.figure(figsize=(20, 20))
@@ -65,8 +53,15 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
 
     if isinstance(draw, list):
         max_x, min_x, max_y, min_y = -np.inf, np.inf, -np.inf, np.inf
-        for d in draw:
-            ax.plot(d.x, d.y, color=lc, linewidth=lw)
+
+        if not isinstance(lc, list):
+            lc = [lc for i in range(len(draw))]
+        if len(lc) != len(draw):
+            for i in range(len(draw) - len(lc)):
+                lc.append("k")
+
+        for i, d in enumerate(draw):
+            ax.plot(d.x, d.y, color=lc[i], linewidth=lw)
             if max(d.x) > max_x:
                 max_x = max(d.x)
             if min(d.x) < min_x:
