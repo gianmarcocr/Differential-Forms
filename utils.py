@@ -42,9 +42,14 @@ def fig2img(fig):
     return img
 
 
-def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", lc: Union[str, list] = "k",
+def plot_drawing(draw: Union[object, list],
+                 save: bool = False,
+                 bc: str = "w",
+                 lc: Union[str, list] = "k",
                  lw: float = 1.0,
-                 show: bool = True):
+                 show: bool = True,
+                 logo: bool = False,
+                 legend: bool = False):
     # metadata = draw.get_metadata()
 
     fig = plt.figure(figsize=(20, 20))
@@ -56,12 +61,14 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
 
         if not isinstance(lc, list):
             lc = [lc for i in range(len(draw))]
+
         if len(lc) != len(draw):
             for i in range(len(draw) - len(lc)):
                 lc.append("k")
 
         for i, d in enumerate(draw):
-            ax.plot(d.x, d.y, color=lc[i], linewidth=lw)
+            assert hasattr(d, "x") and hasattr(d, "y"), print(f"Curve {d} doesn't have the correct attributes")
+            ax.plot(d.x, d.y, color=lc[i], linewidth=lw, label=i)
             if max(d.x) > max_x:
                 max_x = max(d.x)
             if min(d.x) < min_x:
@@ -72,10 +79,7 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
                 min_y = min(d.y)
 
     elif hasattr(draw, "x") and hasattr(draw, "y"):  # TODO fix if else assert
-        # from matplotlib.lines import Line2D
-        # line = Line2D(draw.x, draw.y, color="k", linewidth=lw)  # it works or not??
-        # ax.add_line(line)
-        ax.plot(draw.x, draw.y, color=lc, linewidth=lw)
+        ax.plot(draw.x, draw.y, color=lc, linewidth=lw, label="curve")
         max_x, min_x, max_y, min_y = max(draw.x), min(draw.x), max(draw.y), min(draw.y)
 
     else:
@@ -83,13 +87,26 @@ def plot_drawing(draw: Union[object, list], save: bool = False, bc: str = "w", l
 
     ax.set_xlim(max_x + 0.1, min_x - 0.1)
     ax.set_ylim(max_y + 0.1, min_y - 0.1)
-    ax.axis('off')
+    ax.invert_xaxis()
+    ax.invert_yaxis()
     plt.tight_layout()
 
+    if logo:
+        from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
+        im = Image.open(r"sample_img/logo.png")
+        imagebox = OffsetImage(np.array(im), zoom=0.15, cmap="gray")
+        ab = AnnotationBbox(imagebox, (max_x, min_y), frameon=False)
+        ax.add_artist(ab)
+
     if show:
+        if legend:
+            ax.legend()
         plt.show()
 
     if save:
+        if legend:
+            ax.get_legend().remove()
+        ax.axis('off')
         save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}"
         fig.savefig(save_path + ".svg", facecolor=fig.get_facecolor(), dpi=300)
         fig.savefig(save_path + ".png", facecolor=fig.get_facecolor(), dpi=300)

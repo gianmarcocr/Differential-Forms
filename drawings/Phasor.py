@@ -1,5 +1,3 @@
-from typing import Union
-
 import numpy as np
 import utils
 import warnings
@@ -222,12 +220,14 @@ class Pintograph:
         alpha = 0.5
         ax.set_facecolor("white")
         ax.axis('equal')
+
         r1_label = self.p1.r if isinstance(self.p1.r, int) or isinstance(self.p1.r, float) else [self.p1.r[i] for i in
                                                                                                  range(3)] + ["..."]
         p1 = ax.plot(self.p1.x, self.p1.y, label=f'Phasor 1: r={r1_label} ', alpha=alpha)
         ax.plot(self.p1.x_c, self.p1.y_c, c=p1[0].get_color(), marker="o", alpha=alpha)
         ax.plot([self.p1.x[0], self.x[0]], [self.p1.y[0], self.y[0]], 'k', label=f"Arm 1: l={self.l1}", alpha=alpha,
                 zorder=2)
+
         r2_label = self.p2.r if isinstance(self.p2.r, int) or isinstance(self.p2.r, float) else [self.p2.r[i] for i in
                                                                                                  range(3)] + ["..."]
         p2 = ax.plot(self.p2.x, self.p2.y, label=f'Phasor 2: r={r2_label}', alpha=alpha)
@@ -235,6 +235,7 @@ class Pintograph:
         ax.plot([self.p2.x[0], self.x[0]], [self.p2.y[0], self.y[0]], 'k', label=f"Arm 2: l={self.l2}", alpha=alpha,
                 zorder=2)
         ax.plot(self.x, self.y, label='Pintograph', alpha=1, c="k", lw=2, zorder=1)
+
         start_x, end_x = ax.get_xlim()
         ax.xaxis.set_ticks(np.arange(int(start_x), int(end_x), 0.5))
         start_y, end_y = ax.get_ylim()
