@@ -1,12 +1,13 @@
 import numpy as np
-import utils
 import warnings
 import matplotlib.pyplot as plt
+from .Curve_abs import Curve
 
 
-class Phasor:
+class Phasor(Curve):
     def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1, period: float = 10,
                  phase: float = 0):
+        super().__init__()
         self.x_c = x_cent
         self.y_c = y_cent
         self.r = radius
@@ -17,26 +18,6 @@ class Phasor:
         self.y = self.y_c + self.r * np.sin((2 * np.pi / self.T) * self.t + self.phi)
 
 
-    def get_metadata(self):
-        phasor_meta = self.__dict__.copy()
-        return str(phasor_meta)
-
-    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
-
-    def rotate(self, x_rot, y_rot, t_background):
-        self.x, self.y = utils.rotate_curve(self.x, self.y, self.t, x_rot=x_rot, y_rot=y_rot,
-                                            t_background=t_background)
-        return self
-
-    def translate(self, v_x, v_y):
-        self.x, self.y = utils.translate_curve(self.x, self.y, self.t, v_x=v_x, v_y=v_y)
-        return self
-
-    def __getitem__(self, item):
-        return self.x[item], self.y[item]
-
-
 def line_from_points(p, q):
     a = q[1] - p[1]
     b = q[0] - p[0]
@@ -45,7 +26,7 @@ def line_from_points(p, q):
     return m, q
 
 
-def linecircle(x, y, r, m, q, choice):
+def linecircle(x, y, r, m, q, choice=2):
     a = -2 * x
     b = -2 * y
     c = a ** 2 / 4 + b ** 2 / 4 - r ** 2
@@ -54,84 +35,31 @@ def linecircle(x, y, r, m, q, choice):
     c1 = q ** 2 + b * q + c
     delta = b1 ** 2 - 4 * a1 * c1
     if delta > 0:
-        if choice == "1":
+        if choice == 1:
             x1 = (-b1 + np.sqrt(delta)) / (2 * a1)
-        elif choice == "2":
+        elif choice == 2:
             x1 = (-b1 - np.sqrt(delta)) / (2 * a1)
-
+        else:
+            raise "Wrong choice. Can be only 1 o 2"
     if delta <= 0:
         print("non va dio can")
     return x1, m * x1 + q
 
 
-def prolunga(Sx, Sy, Cx, Cy, r, choice="2"):
+def prolunga(Sx, Sy, Cx, Cy, r, choice):
     sol = []
     for i in range(len(Sx)):
         m, q = line_from_points([Sx[i], Sy[i]], [Cx[i], Cy[i]])
         sol.append(linecircle(Cx[i], Cy[i], r, m, q, choice))
     return np.asarray(sol)
 
-class Pendulum:
-    """
-        Builds a "pendulum".
 
-        Args:
-            x_cent, y_cent: center coordinates
-            radius: pendulum radius
-            max_angle: half of the maximum aperture of the pendulum (rad)
-            period: period of oscillation
-            phase: direction of equilibrium (rad)
-
-            x(t) = x_c + r * cos(alpha + phase)
-            y(t) = y_c + r * sin(max_angle*alpha + phase)
-            alpha(t) = 2pi/T * t
-
-        Returns:
-
-    """
-
-    def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1,
-                 max_angle: float = np.pi/6, period: float = 10, phase: float = 0
-                 ):
-        self.x_c = x_cent
-        self.y_c = y_cent
-        self.r = radius
-        self.t = time
-        self.T = period
-        self.max_angle = max_angle
-        self.phi = phase
-
-        self.omega = 2*np.pi/self.T
-        self.alpha = self.max_angle * np.sin(self.omega * self.t)
-        self.x = self.x_c + self.r * np.cos(self.alpha + self.phi)
-        self.y = self.y_c + self.r * np.sin(self.alpha + self.phi)
-
-
-    def get_metadata(self):
-        phasor_meta = self.__dict__.copy()
-        return str(phasor_meta)
-
-    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
-
-    def rotate(self, x_rot, y_rot, t_background):
-        self.x, self.y = utils.rotate_curve(self.x, self.y, self.t, x_rot=x_rot, y_rot=y_rot,
-                                            t_background=t_background)
-        return self
-
-    def translate(self, v_x, v_y):
-        self.x, self.y = utils.translate_curve(self.x, self.y, self.t, v_x=v_x, v_y=v_y)
-        return self
-
-    def __getitem__(self, item):
-        return self.x[item], self.y[item]
-
-
-class Pintograph:
-    def __init__(self, phasor1, phasor2, arm1: float, arm2: float, extension: int = 0, choice: str = "up"):
-        self.p1 = phasor1
-        self.p2 = phasor2
-        self.t = phasor1.t
+class Pintograph(Curve):
+    def __init__(self, curve1, curve2, arm1: float, arm2: float, extension: int = 0, choice: str = "up"):
+        super().__init__()
+        self.p1 = curve1
+        self.p2 = curve2
+        self.t = curve1.t
         self.l1 = arm1
         self.l2 = arm2
         self.u = extension
@@ -212,9 +140,6 @@ class Pintograph:
 
             return x, y
 
-    def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0):
-        utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth)
-
     def display(self):
         fig, ax = plt.subplots(figsize=(10, 10))
         alpha = 0.5
@@ -245,15 +170,3 @@ class Pintograph:
         ax.set_ylabel("y")
         ax.set_title("Pintograph")
         ax.legend()
-
-    def rotate(self, x_rot, y_rot, t_background, phase):
-        self.x, self.y = utils.rotate_curve(self.x, self.y, self.p1.t, x_rot=x_rot, y_rot=y_rot,
-                                            t_background=t_background, phi=phase)
-        return self
-
-    def translate(self, v_x, v_y):
-        self.x, self.y = utils.translate_curve(self.x, self.y, self.p1.t, v_x=v_x, v_y=v_y)
-        return self
-
-    def __getitem__(self, item):
-        return self.x[item], self.y[item]
