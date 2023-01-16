@@ -15,6 +15,8 @@ matplotlib.use('TkAgg')
 np.set_printoptions(suppress=True)
 sns.set_theme()
 
+# test
+
 draw_path = Path("images")
 draw_path.mkdir(exist_ok=True)
 
