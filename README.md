@@ -23,10 +23,10 @@ pip install -r requirements.txt
 
 
 ### Coming soon:
-- [ ] Demo script;
-- [ ] More sample images; 
+- [X] Demo script;
+- [ ] More sample images;
 - [ ] Detailed explanation;
 - [x] Parameters dump;
-- [ ] Move to abstract class;
+- [X] Move to abstract class;
 - [x] Jupyter Notebook;
 - [x] Move to lines instead of points

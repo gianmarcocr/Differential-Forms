@@ -38,8 +38,8 @@ if __name__ == "__main__":
 
     curve = Phasor(time=tim, x_cent=0, y_cent=0, radius=r1, period=1, phase=0)
     curve2 = Phasor(time=tim, x_cent=8, y_cent=0, radius=r2, period=1, phase=0)
-    pinto = Pintograph(phasor1=curve, phasor2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0)
-    pinto1 = Pintograph(phasor1=curve, phasor2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.3)
-    pinto2 = Pintograph(phasor1=curve, phasor2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.6)
+    pinto = Pintograph(curve1=curve, curve2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0)
+    pinto1 = Pintograph(curve1=pinto, curve2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.3)
+    pinto2 = Pintograph(curve1=curve, curve2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.6)
     canv = DrawingCanvas().add([pinto, pinto1, pinto2])
     canv.plot(linecolor=["k", "b", "r"])
