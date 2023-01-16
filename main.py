@@ -7,7 +7,7 @@ import numpy as np
 import seaborn as sns
 
 from drawings.Phasor import Phasor, Pintograph
-from drawings.Lissajous import Lissajous
+# from drawings.Lissajous import Lissajous
 from drawings.Canvas import DrawingCanvas
 from utils import timeline
 

@@ -6,7 +6,7 @@ from typing import Union
 import os
 from datetime import datetime
 from tqdm import tqdm
-from drawings.Curve import Curve
+# from drawings.Curve import Curve  # TODO FIX
 
 
 def pol2cart(rho, theta):

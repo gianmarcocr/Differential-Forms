@@ -1,7 +1,7 @@
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
-from .Curve_abs import Curve
+from .Curve import Curve
 
 
 class Phasor(Curve):
