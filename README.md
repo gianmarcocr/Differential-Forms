@@ -3,7 +3,7 @@
 Made by Gianmarco Cracco & Andrea Borghi. Our [Instagram](https://instagram.com/differentialforms?igshid=YmMyMTA2M2Y=).
 
 <p align="center">
-  <img width="489" height="489" src=logo/logo_DF-PNG.png alt="">
+  <img src=logo/logo_DF-PNG.png alt="">
 </p>
 
 [//]: # (<img src="./Sample_imgs/sample_plot.jpg" width=""/>)
