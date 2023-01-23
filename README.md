@@ -5,7 +5,6 @@ Made by Gianmarco Cracco & Andrea Borghi. Our [Instagram](https://instagram.com/
 <p align="center">
   <img width="489" height="489" src=logo/logo_DF-PNG.png alt="">
 </p>
-![](logo/logo_DF-PNG.png)
 
 [//]: # (<img src="./Sample_imgs/sample_plot.jpg" width=""/>)
 ### Setup
