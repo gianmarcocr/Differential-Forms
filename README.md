@@ -2,6 +2,9 @@
 
 Made by Gianmarco Cracco & Andrea Borghi. Our [Instagram](https://instagram.com/differentialforms?igshid=YmMyMTA2M2Y=).
 
+<p align="center">
+  <img width="489" height="489" src=logo/logo_DF-PNG.png alt="">
+</p>
 ![](logo/logo_DF-PNG.png)
 
 [//]: # (<img src="./Sample_imgs/sample_plot.jpg" width=""/>)
@@ -17,7 +20,7 @@ git clone https://github.com/gianmarcocr/Differential-Forms.git
 Move to your directory and setup a virtual env:
 ```bash
 python -m venv venv
-source source venv/bin/activate
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
