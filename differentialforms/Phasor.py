@@ -1,6 +1,9 @@
-import numpy as np
 import warnings
+
 import matplotlib.pyplot as plt
+import numpy as np
+
+from utils import compute_length
 from .Curve import Curve
 
 
@@ -16,6 +19,7 @@ class Phasor(Curve):
         self.phi = phase
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
         self.y = self.y_c + self.r * np.sin((2 * np.pi / self.T) * self.t + self.phi)
+        self.length = compute_length(self)
 
 
 def line_from_points(p, q):
@@ -42,7 +46,7 @@ def linecircle(x, y, r, m, q, choice=2):
         else:
             raise "Wrong choice. Can be only 1 o 2"
     if delta <= 0:
-        print("non va dio can")
+        print("delta <=0")
     return x1, m * x1 + q
 
 
@@ -65,6 +69,7 @@ class Pintograph(Curve):
         self.u = extension
         self.choice = choice
         self.x, self.y = self.solution
+        self.length = compute_length(self)
 
     def get_metadata(self):
         pinto_meta = self.__dict__.copy()
@@ -99,9 +104,6 @@ class Pintograph(Curve):
 
     @staticmethod
     def intersection(x1, y1, r1, x2, y2, r2, choice):
-        """
-        source: https://stackoverflow.com/questions/55816902/finding-the-intersection-of-two-circles
-        """
         d = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         x, y = np.nan, np.nan
         # non intersecting

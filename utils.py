@@ -1,12 +1,30 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
+from datetime import datetime
 # from PIL.PngImagePlugin import PngInfo
 from typing import Union
-import os
-from datetime import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
 from tqdm import tqdm
-# from drawings.Curve import Curve  # TODO FIX
+from pathlib import Path
+from datetime import date
+import os
+
+# from differentialforms.Curve import Curve  # TODO FIX
+
+
+def ensure_folder_struct():
+    Path("images").mkdir(exist_ok=True)
+    today_path = Path("images") / date.today().strftime("%d-%m-%y")
+    today_path.mkdir(exist_ok=True)
+    os.environ["today_path"] = str(today_path)
+
+
+def compute_length(curve):
+    l = 0
+    for i in range(len(curve.t) - 1):
+        l += ((curve.x[i + 1] - curve.x[i]) ** 2 + (curve.y[i + 1] - curve.y[i]) ** 2) ** 0.5
+    return l
 
 
 def pol2cart(rho, theta):
@@ -91,24 +109,24 @@ def plot_drawing(draw: Union[object, list],
     ax.invert_yaxis()
     plt.tight_layout()
 
-    if logo:
-        from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
-        im = Image.open(r"sample_img/logo.png")
-        imagebox = OffsetImage(np.array(im), zoom=0.15, cmap="gray")
-        ab = AnnotationBbox(imagebox, (max_x, min_y), frameon=False)
-        ax.add_artist(ab)
-
     if show:
         if legend:
             ax.legend()
         plt.show()
 
     if save:
+        ensure_folder_struct()
         if legend:
             ax.get_legend().remove()
         ax.axis('off')
         save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}"
         fig.savefig(save_path + ".svg", facecolor=fig.get_facecolor(), dpi=300)
+        if logo:
+            from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
+            im = Image.open(r"logo/logo_DF-PNG.png")
+            imagebox = OffsetImage(np.array(im), zoom=0.1, cmap="gray")
+            ab = AnnotationBbox(imagebox, (max_x, min_y), frameon=False)
+            ax.add_artist(ab)
         fig.savefig(save_path + ".png", facecolor=fig.get_facecolor(), dpi=300)
         plt.close()
 

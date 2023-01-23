@@ -2,7 +2,7 @@
 
 Made by Gianmarco Cracco & Andrea Borghi. Our [Instagram](https://instagram.com/differentialforms?igshid=YmMyMTA2M2Y=).
 
-![](sample_img/sample_plot.jpg)
+![](logo/logo_DF-PNG.png)
 
 [//]: # (<img src="./Sample_imgs/sample_plot.jpg" width=""/>)
 ### Setup
@@ -21,12 +21,7 @@ source source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-
-### Coming soon:
-- [X] Demo script;
-- [ ] More sample images;
-- [ ] Detailed explanation;
-- [x] Parameters dump;
-- [X] Move to abstract class;
-- [x] Jupyter Notebook;
-- [x] Move to lines instead of points
+### Some images
+![](sample_img/sample_plot1.jpg)
+![](sample_img/sample_plot2.jpg)
+![](sample_img/sample_plot3.jpg)

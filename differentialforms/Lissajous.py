@@ -1,6 +1,9 @@
 from typing import Union
-import numpy as np
-from .Curve_abs import Curve
+
+from numpy import cos, sin, pi
+
+from utils import compute_length
+from .Curve import Curve
 
 
 class Lissajous(Curve):
@@ -11,5 +14,6 @@ class Lissajous(Curve):
         self.phi = phase
         self.T_x = x_period
         self.T_y = y_period
-        self.x = np.cos(2 * np.pi / self.T_x * self.t + self.phi)
-        self.y = np.sin(2 * np.pi / self.T_y * self.t + self.phi)
+        self.x = cos(2 * pi / self.T_x * self.t + self.phi)
+        self.y = sin(2 * pi / self.T_y * self.t + self.phi)
+        self.length = compute_length(self)

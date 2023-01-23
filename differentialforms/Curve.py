@@ -1,5 +1,6 @@
-import utils
 from abc import ABC, abstractmethod
+
+import utils
 
 
 class Curve(ABC):

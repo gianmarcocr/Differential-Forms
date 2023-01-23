@@ -7,7 +7,7 @@ from pathlib import Path
 import os
 import utils
 from tqdm import tqdm
-from drawings.Phasor import Phasor, Pintograph, Pendulum
+from differentialforms.Phasor import Phasor, Pintograph, Pendulum
 
 matplotlib.use('TkAgg')
 draw_path = Path("images")
