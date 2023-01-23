@@ -24,6 +24,6 @@ pip install -r requirements.txt
 ```
 
 ### Some images
-![](sample_img/sample_plot1.jpg)
-![](sample_img/sample_plot2.jpg)
-![](sample_img/sample_plot3.jpg)
+![](sample_imgs/sample_plot1.jpg)
+![](sample_imgs/sample_plot2.jpg)
+![](sample_imgs/sample_plot3.jpg)
