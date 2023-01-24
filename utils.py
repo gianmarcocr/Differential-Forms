@@ -9,6 +9,8 @@ from tqdm import tqdm
 from pathlib import Path
 from datetime import date
 import os
+from matplotlib.collections import LineCollection
+
 
 # from differentialforms.Curve import Curve  # TODO FIX
 
@@ -47,7 +49,7 @@ def translate_curve(x, y, time, v_x: float = 0, v_y: float = 0):
 
 
 def timeline(t_max: int, dt: float, t_min: int = 0) -> object:
-    return np.arange(t_min, t_max + 1, dt)
+    return np.arange(t_min, t_max + dt, dt)
 
 
 def fig2img(fig):
@@ -86,7 +88,13 @@ def plot_drawing(draw: Union[object, list],
 
         for i, d in enumerate(draw):
             assert hasattr(d, "x") and hasattr(d, "y"), print(f"Curve {d} doesn't have the correct attributes")
-            ax.plot(d.x, d.y, color=lc[i], linewidth=lw, label=i)
+            # ax.plot(d.x, d.y, color=lc[i], linewidth=lw, label=i)
+            points = np.array([d.x, d.y]).T.reshape(-1, 1, 2)
+            segments = np.concatenate([points[:-1], points[1:]], axis=1)
+            norm = plt.Normalize(d.t[0], d.t[-1])
+            ls = LineCollection(segments, cmap="magma", norm=norm)
+            ls.set_array(d.t)
+            ax.add_collection(ls)
             if max(d.x) > max_x:
                 max_x = max(d.x)
             if min(d.x) < min_x:
@@ -123,8 +131,10 @@ def plot_drawing(draw: Union[object, list],
         fig.savefig(save_path + ".svg", facecolor=fig.get_facecolor(), dpi=300)
         if logo:
             from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
-            im = Image.open(r"logo/logo_DF-PNG.png")
-            imagebox = OffsetImage(np.array(im), zoom=0.1, cmap="gray")
+            im = np.array(Image.open(r"logo/logo_DF-PNG.png"))
+            # if bc == "k":
+            #     im = 255 - im
+            imagebox = OffsetImage(im, zoom=0.1, cmap="gray")
             ab = AnnotationBbox(imagebox, (max_x, min_y), frameon=False)
             ax.add_artist(ab)
         fig.savefig(save_path + ".png", facecolor=fig.get_facecolor(), dpi=300)

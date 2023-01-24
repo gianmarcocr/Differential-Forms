@@ -14,15 +14,12 @@ sns.set_theme()
 # test
 
 if __name__ == "__main__":
-    t = timeline(t_max=100, dt=0.1)
-    tmax = 100.000001  # to include last tmax as last value
+    tmax = 100  # to include last tmax as last value
     dt = 0.01
 
     pi = np.pi
-    tim = timeline(tmax, dt)
+    tim = timeline(t_max=tmax, dt=dt)
     u = tim / tmax
-
-    T = tmax
 
     r1 = 1.3 + np.sin(2 * pi * u * 1)
     r2 = 1. + np.sin(2 * pi * u)
@@ -33,4 +30,5 @@ if __name__ == "__main__":
     # pinto1 = Pintograph(curve1=pinto, curve2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.3)
     # pinto2 = Pintograph(curve1=curve, curve2=curve2, arm1=6.2, arm2=6.2, extension=0).rotate(4.5, 2.5, tmax, 0.6)
     canv = DrawingCanvas().add([pinto])#, pinto1, pinto2])
+    lw = u * 5
     canv.plot(linecolor=["k"], save=True, logo=True, show=False)
