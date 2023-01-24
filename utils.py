@@ -88,13 +88,13 @@ def plot_drawing(draw: Union[object, list],
 
         for i, d in enumerate(draw):
             assert hasattr(d, "x") and hasattr(d, "y"), print(f"Curve {d} doesn't have the correct attributes")
-            # ax.plot(d.x, d.y, color=lc[i], linewidth=lw, label=i)
-            points = np.array([d.x, d.y]).T.reshape(-1, 1, 2)
-            segments = np.concatenate([points[:-1], points[1:]], axis=1)
-            norm = plt.Normalize(d.t[0], d.t[-1])
-            ls = LineCollection(segments, cmap="magma", norm=norm)
-            ls.set_array(d.t)
-            ax.add_collection(ls)
+            ax.plot(d.x, d.y, color=lc[i], linewidth=lw, label=i)
+            # points = np.array([d.x, d.y]).T.reshape(-1, 1, 2)
+            # segments = np.concatenate([points[:-1], points[1:]], axis=1)
+            # norm = plt.Normalize(d.t[0], d.t[-1])
+            # ls = LineCollection(segments, cmap="magma", norm=norm)
+            # ls.set_array(d.t)
+            # ax.add_collection(ls)
             if max(d.x) > max_x:
                 max_x = max(d.x)
             if min(d.x) < min_x:
