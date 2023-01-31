@@ -72,7 +72,7 @@ def plot_drawing(draw: Union[object, list],
                  legend: bool = False):
     # metadata = draw.get_metadata()
 
-    fig = plt.figure(figsize=(20, 20))
+    fig = plt.figure(figsize=(15, 15))
     ax = fig.add_subplot(111, aspect="equal")
     fig.patch.set_facecolor(bc)  # remove this to remove background
 

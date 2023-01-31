@@ -17,26 +17,23 @@ today_path.mkdir(exist_ok=True)
 os.environ["today_path"] = str(today_path)
 
 k = 1  # scale factor
-ticc = 1  # thickness factor
+ticc = 2  # thickness factor
 
-tmax = 100
-dt = 0.01  # 0.05
-video_length = 30  # [s]
-x_rot, y_rot = 0, 0
-T_foglio = -5
+tmax = 300
+dt = 0.05  # 0.05
+video_lenght = 30  # in sec
+x_rot, y_rot = -0.7, -0.5
+T_foglio = -3000
 
 tim = utils.timeline(t_max=tmax, dt=dt)
-u = tim / (tmax+1)   # normalized time
+u = tim / tmax  # normalized time
 
-r1 = tim # 13 * np.sqrt(np.pi * (u + 0.01))
-r2 = 3 * np.sin(10 * np.pi * u) * tim/10
-
-t1 = 50
-t2 = 0.5  # np.cos(np.pi * 2*u)
+r1 = 4 * np.sqrt(u + 0.3)
+r2 = 1.3 * np.sin(np.pi * u) ** 2
 
 # FASORE SU FASORE - B sopra ad A
-A = Phasor(tim, x_cent=0, y_cent=0, radius=r1, period=t1, phase=0)
-B = Phasor(tim, x_cent=A.x, y_cent=A.y, radius=r2, period=t2, phase=0)
+A = Phasor(tim, x_cent=0, y_cent=0, radius=r1, period=170, phase=0)
+B = Phasor(tim, x_cent=A.x, y_cent=A.y, radius=r2, period=3, phase=0)
 # C = B.rotate(x_rot, y_rot, t=T_foglio)
 # pintograph = Pintograph(phasor1=phasor1, phasor2=phasor2, arm1=5, arm2=5, extension=0)
 
@@ -79,9 +76,9 @@ class Anim:
         if True:
             path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.mov"
             self.ani.save(path,
-                          fps=(tmax // (dt * video_length)),
+                          fps=(tmax // (dt * video_lenght)),
                           dpi=100)
-            utils.plot_drawing(scia[-1], save=True, show=False)
+            utils.plot_drawing(scia[-1], True, show=False)
 
         fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
 
@@ -128,5 +125,4 @@ class Anim:
 
 
 pa = Anim()
-exit()
-# plt.show()
+plt.show()
