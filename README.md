@@ -2,7 +2,9 @@
 
 Made by Gianmarco Cracco & Andrea Borghi. Our [Instagram](https://instagram.com/differentialforms?igshid=YmMyMTA2M2Y=).
 
-![](sample_img/sample_plot.jpg)
+<p align="center">
+  <img src=logo/logo_DF.png alt="">
+</p>
 
 [//]: # (<img src="./Sample_imgs/sample_plot.jpg" width=""/>)
 ### Setup
@@ -17,16 +19,11 @@ git clone https://github.com/gianmarcocr/Differential-Forms.git
 Move to your directory and setup a virtual env:
 ```bash
 python -m venv venv
-venv/bin/activate
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-
-### Coming soon:
-- [ ] Demo script;
-- [ ] More sample images; 
-- [ ] Detailed explanation;
-- [x] Parameters dump;
-- [ ] Move to abstract class;
-- [x] Jupyter Notebook;
-- [ ] Move to lines instead of points
+### Some images
+![](sample_imgs/sample_plot1.jpg)
+![](sample_imgs/sample_plot2.jpg)
+![](sample_imgs/sample_plot3.jpg)
