@@ -196,12 +196,12 @@ def sigmoid(x, a: float = 1, b: float = 0):
     Args:
         x: point where to compute sigmoid
         a: increase steepness
-        b: translate sigmoid fest or right
+        b: translate sigmoid left or right
 
-    Returns: 1/(1+e^(ax+b)
+    Returns: 1/(1+e^(-ax+b)
 
     """
-    return 1 / (1 + np.exp(a * x + b))
+    return 1 / (1 + np.exp(-a * x + b))
 
 # def rot(i,j):
 #     rot_matrix = np.array([[np.cos(omega * dt * (i-j)), -np.sin(omega * dt * (i-j))],
@@ -214,3 +214,32 @@ def sigmoid(x, a: float = 1, b: float = 0):
 #         r = [x_rot, y_rot] + np.dot(rot(i,j), [pinto.x[j] - x_rot, pinto.x[j] - x_rot])
 #         rot_i.append(r)
 #     rotated_curve_new.append(rot_i)
+
+
+# def piecewise(time: timeline, steps: list):
+#     v = np.zeros_like(time)
+#     start = 0
+#     c = steps[0][1]
+#     d = []
+#     for i in range(len(steps)):
+#         v[start:steps[i][0]] =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
