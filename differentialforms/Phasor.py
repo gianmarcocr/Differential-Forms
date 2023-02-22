@@ -3,18 +3,18 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils import compute_length
+from utils import compute_length, line_from_points, Timeline
 from .Curve import Curve
 
 
 class Phasor(Curve):
-    def __init__(self, time, x_cent: float = 0, y_cent: float = 0, radius: float = 1, period: float = 10,
+    def __init__(self, time: Timeline, x_cent: float = 0, y_cent: float = 0, radius: float = 1, period: float = 10,
                  phase: float = 0):
         super().__init__()
         self.x_c = x_cent
         self.y_c = y_cent
         self.r = radius
-        self.t = time
+        self.t = time.time
         self.T = period
         self.phi = phase
         self.x = self.x_c + self.r * np.cos((2 * np.pi / self.T) * self.t + self.phi)
@@ -22,53 +22,18 @@ class Phasor(Curve):
         self.length = compute_length(self)
 
 
-def line_from_points(p, q):
-    a = q[1] - p[1]
-    b = q[0] - p[0]
-    m = a / b
-    q = (q[0] * p[1] - p[0] * q[1]) / b
-    return m, q
-
-
-def linecircle(x, y, r, m, q, choice=2):
-    a = -2 * x
-    b = -2 * y
-    c = a ** 2 / 4 + b ** 2 / 4 - r ** 2
-    a1 = 1 + m ** 2
-    b1 = 2 * m * q + a + b * m
-    c1 = q ** 2 + b * q + c
-    delta = b1 ** 2 - 4 * a1 * c1
-    if delta > 0:
-        if choice == 1:
-            x1 = (-b1 + np.sqrt(delta)) / (2 * a1)
-        elif choice == 2:
-            x1 = (-b1 - np.sqrt(delta)) / (2 * a1)
-        else:
-            raise "Wrong choice. Can be only 1 o 2"
-    if delta <= 0:
-        print("delta <=0")
-    return x1, m * x1 + q
-
-
-def prolunga(Sx, Sy, Cx, Cy, r, choice):
-    sol = []
-    for i in range(len(Sx)):
-        m, q = line_from_points([Sx[i], Sy[i]], [Cx[i], Cy[i]])
-        sol.append(linecircle(Cx[i], Cy[i], r, m, q, choice))
-    return np.asarray(sol)
-
-
 class Pintograph(Curve):
     def __init__(self, curve1, curve2, arm1: float, arm2: float, extension: int = 0, choice: str = "up"):
         super().__init__()
         self.p1 = curve1
         self.p2 = curve2
+        assert curve1.t.all() == curve2.t.all(), "curve1 and curve2 have different timelines"
         self.t = curve1.t
         self.l1 = arm1
         self.l2 = arm2
         self.u = extension
         self.choice = choice
-        self.x, self.y = self.solution
+        self.x, self.y = self._solution
         self.length = compute_length(self)
 
     def get_metadata(self):
@@ -81,7 +46,7 @@ class Pintograph(Curve):
         return meta
 
     @property
-    def solution(self):
+    def _solution(self):
         assert len(self.p1.t) == len(self.p2.t), print(
             f"Phasor 1 and 2 time vectors have different lengths: {self.p1.t} != {self.p2.t}")
         sol_x = []
@@ -172,3 +137,30 @@ class Pintograph(Curve):
         ax.set_ylabel("y")
         ax.set_title("Pintograph")
         ax.legend()
+
+
+def extend(Sx, Sy, Cx, Cy, r, choice):
+    def linecircle(x, y, r, m, q, choice=2):
+        a = -2 * x
+        b = -2 * y
+        c = a ** 2 / 4 + b ** 2 / 4 - r ** 2
+        a1 = 1 + m ** 2
+        b1 = 2 * m * q + a + b * m
+        c1 = q ** 2 + b * q + c
+        delta = b1 ** 2 - 4 * a1 * c1
+        if delta > 0:
+            if choice == 1:
+                x1 = (-b1 + np.sqrt(delta)) / (2 * a1)
+            elif choice == 2:
+                x1 = (-b1 - np.sqrt(delta)) / (2 * a1)
+            else:
+                raise "Wrong choice. Can be only 1 o 2"
+        if delta <= 0:
+            print("delta <=0")
+        return x1, m * x1 + q
+
+    sol = []
+    for i in range(len(Sx)):
+        m, q = line_from_points([Sx[i], Sy[i]], [Cx[i], Cy[i]])
+        sol.append(linecircle(Cx[i], Cy[i], r, m, q, choice))
+    return np.asarray(sol)

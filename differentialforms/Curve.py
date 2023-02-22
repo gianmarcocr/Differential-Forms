@@ -1,14 +1,16 @@
 from abc import ABC, abstractmethod
 
+import numpy as np
+
 import utils
 
 
 class Curve(ABC):
     @abstractmethod
-    def __init__(self):
-        self.x = None
-        self.y = None
-        self.t = None
+    def __init__(self, x: np.array = 0, y: np.array = 0, t: utils.Timeline = 0):
+        self.x = x
+        self.y = y
+        self.t = t
 
     def get_metadata(self):
         curve_meta = self.__dict__.copy()
