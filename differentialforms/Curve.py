@@ -7,7 +7,7 @@ import utils
 
 class Curve(ABC):
     @abstractmethod
-    def __init__(self, x: np.array = 0, y: np.array = 0, t: utils.Timeline = 0):
+    def __init__(self, x: np.array = 0, y: np.array = 0, t= 0):
         self.x = x
         self.y = y
         self.t = t
@@ -19,7 +19,7 @@ class Curve(ABC):
     def plot(self, save: bool = False, background: str = "w", linecolor: str = "k", linewidth: float = 1.0, **kwargs):
         utils.plot_drawing(self, save, bc=background, lc=linecolor, lw=linewidth, **kwargs)
 
-    def rotate(self, x_rot, y_rot, t_background, phase):
+    def rotate(self, x_rot, y_rot, t_background, phase=0):
         self.x, self.y = utils.rotate_curve(self.x,
                                             self.y,
                                             self.t,
