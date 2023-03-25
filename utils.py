@@ -24,7 +24,7 @@ def line_from_points(p: list, q: list) -> (float, float):
     get slope and intersect of line trough 2  points
     :param p: first point
     :param q: second point
-    :return: slope, interset
+    :return: slope, intersect
     """
     a = q[1] - p[1]
     b = q[0] - p[0]
@@ -209,35 +209,35 @@ def parse_metadata(data):
     return
 
 
-def rotate_live(curve: Curve, x_rot: float, y_rot: float, t: float):
-    """
-
-    :param curve:
-    :param x_rot:
-    :param y_rot:
-    :param t:
-    :return:
-    """
-    assert hasattr(curve, "x") & hasattr(curve, "y") & hasattr(curve, "t"), print(
-        "Curve doesn't have the correct attributes")
-
-    curve_rotated = []
-    dt = curve.t[1]
-    omega = 0 if t == 0 else -2 * np.pi / t
-
-    for i in tqdm(range(0, len(curve.t)), desc="Computing rotated curve"):
-        rot_x_i = []
-        rot_y_i = []
-        for j in range(i + 1):
-            x = x_rot + np.cos(omega * dt * (i - j)) * (curve.x[j] - x_rot) - np.sin(omega * dt * (i - j)) * (
-                    curve.y[j] - y_rot)
-            y = y_rot + np.sin(omega * dt * (i - j)) * (curve.x[j] - x_rot) + np.cos(omega * dt * (i - j)) * (
-                    curve.y[j] - y_rot)
-            rot_x_i.append(x)
-            rot_y_i.append(y)
-        curve_rotated.append(Curve(x=rot_x_i, y=rot_y_i, t=curve.t[:i]))
-
-    return curve_rotated
+# def rotate_live(curve: Curve, x_rot: float, y_rot: float, t: float):
+#     """
+#
+#     :param curve:
+#     :param x_rot:
+#     :param y_rot:
+#     :param t:
+#     :return:
+#     """
+#     assert hasattr(curve, "x") & hasattr(curve, "y") & hasattr(curve, "t"), print(
+#         "Curve doesn't have the correct attributes")
+#
+#     curve_rotated = []
+#     dt = curve.t[1]
+#     omega = 0 if t == 0 else -2 * np.pi / t
+#
+#     for i in tqdm(range(0, len(curve.t)), desc="Computing rotated curve"):
+#         rot_x_i = []
+#         rot_y_i = []
+#         for j in range(i + 1):
+#             x = x_rot + np.cos(omega * dt * (i - j)) * (curve.x[j] - x_rot) - np.sin(omega * dt * (i - j)) * (
+#                     curve.y[j] - y_rot)
+#             y = y_rot + np.sin(omega * dt * (i - j)) * (curve.x[j] - x_rot) + np.cos(omega * dt * (i - j)) * (
+#                     curve.y[j] - y_rot)
+#             rot_x_i.append(x)
+#             rot_y_i.append(y)
+#         curve_rotated.append(Curve(x=rot_x_i, y=rot_y_i, t=curve.t[:i]))
+#
+#     return curve_rotated
 
 
 def sigmoid(x, a: float = 1, b: float = 0):
