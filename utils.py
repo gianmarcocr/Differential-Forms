@@ -1,7 +1,7 @@
 import os
 from datetime import date, datetime
 from pathlib import Path
-from typing import Union
+from typing import Union, Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -117,6 +117,7 @@ def fig2img(fig: plt.figure) -> Image:
 
 
 def plot_drawing(draw: Union[Curve, list[Curve]],
+                 aspect: Literal["auto", "equal"] = "equal",
                  save: bool = False,
                  bc: str = "w",
                  lc: Union[str, list[str]] = "k",
@@ -127,6 +128,7 @@ def plot_drawing(draw: Union[Curve, list[Curve]],
     """
     Plot drawing
     :param draw: curve(s) to be drawn
+    :param aspect: force image to be square
     :param save: if you want to save
     :param bc: background color
     :param lc: line color
@@ -137,7 +139,7 @@ def plot_drawing(draw: Union[Curve, list[Curve]],
     """
 
     fig = plt.figure(figsize=(15, 15))
-    ax = fig.add_subplot(111, aspect="equal")
+    ax = fig.add_subplot(111, aspect=aspect)
     fig.patch.set_facecolor(bc)  # remove this to remove background
 
     if isinstance(draw, list):
