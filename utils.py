@@ -252,14 +252,14 @@ def sigmoid(x, a: float = 1, b: float = 0):
     """
     return 1 / (1 + np.exp(-a * x + b))
 
-def gcode(curve, filename):
-    f = open("filename.nc", "a")
-    f.write("G1"," X", curve.x[0]," Y",curve.y[0], " Z", -1)
+def gcode(curve):
+    f = open("file_gcode.nc", "a")
+    f.write("G1"," X", curve.x[0]," Y",curve.y[0], " Z -1")
 
     for i in range(1,len(curve.x)):                 #loop su curva
-        f.write(" X", curve.x[0]," Y",curve.y[0])
+        f.write(" X", curve.x[i]," Y",curve.y[i]," Z -1")
 
-    f.write("Z", 20) #penup
+    f.write("Z ", 20) #penup
     f.write("G28") #return home
     f.close()
     return
