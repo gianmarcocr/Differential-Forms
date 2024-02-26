@@ -1,25 +1,23 @@
 import os
 from datetime import date, datetime
 from pathlib import Path
-from typing import Union, Literal
+from typing import Literal, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from tqdm import tqdm
-
-from differentialforms.Curve import Curve
+from numba import jit
 
 
 class Timeline:
-    def __init__(self, t_max: int = 100, dt: float = 0.01, t_min: int = 0):
+    def __init__(self, t_max: int = 100, dt: Union[float, int] = 0.01, t_min: int = 0):
         self.t_max = t_max
         self.t_min = t_min
         self.dt = dt
         self.time = np.arange(t_min, t_max + dt, dt)
 
 
-def line_from_points(p: list, q: list) -> (float, float):
+def line_from_points(p: np.array, q: np.array) -> (float, float):
     """
     get slope and intersect of line trough 2  points
     :param p: first point
@@ -44,16 +42,21 @@ def ensure_folder_struct():
     return
 
 
-def compute_length(curve: Curve) -> float:
+@jit(nopython=True)
+def compute_length(x: np.array, y: np.array) -> float:
     """
+    Computes the length of the curve.
+    """
+    dx = np.diff(x)
+    dy = np.diff(y)
 
-    :param curve:
-    :return: lenght of curve
-    """
-    l = 0
-    for i in range(len(curve.t) - 1):
-        l += ((curve.x[i + 1] - curve.x[i]) ** 2 + (curve.y[i + 1] - curve.y[i]) ** 2) ** 0.5
-    return l
+    # Compute the squared differences and sum them
+    squared_diff_sum = np.sum(dx**2 + dy**2)
+
+    # Compute the square root of the sum
+    length = np.sqrt(squared_diff_sum)
+
+    return length
 
 
 def pol2cart(rho: float, theta: float) -> (float, float):
@@ -68,8 +71,16 @@ def pol2cart(rho: float, theta: float) -> (float, float):
     return x, y
 
 
-def rotate_curve(x: np.array, y: np.array, time: Timeline, x_rot: float, y_rot: float, t_background: float = 0,
-                 phi: float = 0) -> (np.array, np.array):
+# @jit(nopython=True)
+def rotate_curve(
+    x: np.array,
+    y: np.array,
+    time: np.array,
+    x_rot: Union[float, int],
+    y_rot: Union[float, int],
+    t_background: Union[float, int] = 0,
+    phi: Union[float, int] = 0,
+) -> (np.array, np.array):
     """
     Rotate a curve give a point of rotation and period
     :param x: x of original curve
@@ -82,12 +93,58 @@ def rotate_curve(x: np.array, y: np.array, time: Timeline, x_rot: float, y_rot: 
     :return: rotated x, rotated y
     """
     omega = 0 if t_background == 0 else 2 * np.pi / t_background
-    qx = x_rot + np.cos(omega * time + phi) * (x - x_rot) - np.sin(omega * time + phi) * (y - y_rot)
-    qy = y_rot + np.sin(omega * time + phi) * (x - x_rot) + np.cos(omega * time + phi) * (y - y_rot)
+    angle = omega * time + phi
+    cos_omega_t_phi = np.cos(angle)
+    sin_omega_t_phi = np.sin(angle)
+
+    qx = x_rot + cos_omega_t_phi * (x - x_rot) - sin_omega_t_phi * (y - y_rot)
+    qy = y_rot + sin_omega_t_phi * (x - x_rot) + cos_omega_t_phi * (y - y_rot)
     return qx, qy
 
 
-def translate_curve(x: np.array, y: np.array, time: Timeline, v_x: float = 0, v_y: float = 0) -> (np.array, np.array):
+# @jit(nopython=True)
+def rotate_curve_w_matrix(
+    x: np.array,
+    y: np.array,
+    time: np.array,
+    x_rot: Union[float, int],
+    y_rot: Union[float, int],
+    t_background: Union[float, int] = 0,
+    phi: Union[float, int] = 0,
+) -> (np.array, np.array):
+    """
+    Rotate a curve give a point of rotation and period
+    :param x: x of original curve
+    :param y: y of original curve
+    :param time: vector of timesteps
+    :param x_rot: x coord of rotation
+    :param y_rot: y coord of rotation
+    :param t_background: background period
+    :param phi: phase
+    :return: rotated x, rotated y
+    """
+    omega = 0 if t_background == 0 else 2 * np.pi / t_background
+    x_translated = x - x_rot
+    y_translated = y - y_rot
+
+    rotation_matrix = np.array(
+        [
+            [np.cos(omega * time + phi), -np.sin(omega * time + phi)],
+            [np.sin(omega * time + phi), np.cos(omega * time + phi)],
+        ]
+    )
+
+    rotated_curve = np.dot(rotation_matrix, np.vstack((x_translated, y_translated)))
+
+    rotated_curve[0, :] += x_rot
+    rotated_curve[1, :] += y_rot
+
+    return qx, qy
+
+
+def translate_curve(
+    x: np.array, y: np.array, time: Timeline, v_x: float = 0, v_y: float = 0
+) -> (np.array, np.array):
     """
     Translate a curve given x and y velocity
     :param x: x of original curve
@@ -109,6 +166,7 @@ def fig2img(fig: plt.figure) -> Image:
     :return:
     """
     import io
+
     buf = io.BytesIO()
     fig.savefig(buf)
     buf.seek(0)
@@ -116,15 +174,17 @@ def fig2img(fig: plt.figure) -> Image:
     return img
 
 
-def plot_drawing(draw: Union[Curve, list[Curve]],
-                 aspect: Literal["auto", "equal"] = "equal",
-                 save: bool = False,
-                 bc: str = "w",
-                 lc: Union[str, list[str]] = "k",
-                 lw: float = 1.0,
-                 show: bool = True,
-                 logo: bool = False,
-                 legend: bool = False):
+def plot_drawing(
+    draw,  #: Union[Curve, list[Curve]],
+    aspect: Literal["auto", "equal"] = "equal",
+    save: bool = False,
+    bc: str = "w",
+    lc: Union[str, list[str]] = "k",
+    lw: float = 1.0,
+    show: bool = True,
+    logo: bool = False,
+    legend: bool = False,
+):
     """
     Plot drawing
     :param draw: curve(s) to be drawn
@@ -153,7 +213,9 @@ def plot_drawing(draw: Union[Curve, list[Curve]],
                 lc.append("k")
 
         for i, d in enumerate(draw):
-            assert hasattr(d, "x") and hasattr(d, "y"), print(f"Curve {d} doesn't have the correct attributes")
+            assert hasattr(d, "x") and hasattr(d, "y"), print(
+                f"Curve {d} doesn't have the correct attributes"
+            )
             ax.plot(d.x, d.y, color=lc[i], linewidth=lw, label=i)
             if max(d.x) > max_x:
                 max_x = max(d.x)
@@ -186,12 +248,16 @@ def plot_drawing(draw: Union[Curve, list[Curve]],
         ensure_folder_struct()
         if legend:
             ax.get_legend().remove()
-        ax.axis('off')
-        save_path = os.environ["today_path"] + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}"
+        ax.axis("off")
+        save_path = (
+            os.environ["today_path"]
+            + f"/{datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}"
+        )
         fig.savefig(save_path + ".svg", facecolor=fig.get_facecolor(), dpi=300)
         if logo:
-            from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
-            im = np.array(Image.open(r"logo/logo_DF-PNG.png"))
+            from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+
+            im = np.array(Image.open(r"../logo/logo_DF-PNG.png"))
             imagebox = OffsetImage(im, zoom=0.1, cmap="gray")
             ab = AnnotationBbox(imagebox, (max_x, min_y), frameon=False)
             ax.add_artist(ab)
@@ -252,15 +318,15 @@ def sigmoid(x, a: float = 1, b: float = 0):
     """
     return 1 / (1 + np.exp(-a * x + b))
 
+
 def gcode(curve):
     f = open("file_gcode.nc", "a")
-    f.write("G1"," X", curve.x[0]," Y",curve.y[0], " Z -1")
+    f.write("G1", " X", curve.x[0], " Y", curve.y[0], " Z -1")
 
-    for i in range(1,len(curve.x)):                 #loop su curva
-        f.write(" X", curve.x[i]," Y",curve.y[i]," Z -1")
+    for i in range(1, len(curve.x)):  # loop su curva
+        f.write(" X", curve.x[i], " Y", curve.y[i], " Z -1")
 
-    f.write("Z ", 20) #penup
-    f.write("G28") #return home
+    f.write("Z ", 20)  # penup
+    f.write("G28")  # return home
     f.close()
     return
-

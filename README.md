@@ -42,4 +42,4 @@ Example 3           |  Example 4
 * better documentations
 * more examples
 * project page on [GitHub Pages](https://pages.github.com)
-
+* add color palette
