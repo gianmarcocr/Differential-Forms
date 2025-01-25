@@ -22,21 +22,21 @@ git clone https://github.com/gianmarcocr/Differential-Forms.git
 
 Move to your directory and set up a virtual env:
 ```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+pip install poetry
+poetry config virtualenvs.in-project true (optional)
+poetry install
 ```
 You're good to go! Play with the code & parameters either with `main.py` or `Differential_Forms.ipynb`. An alpha version of interactive Jupyter notebook can be found in `Differential_Forms_interactive.ipynb`.
 
 ### Some images
 
-Example 1           |  Example 2
-:-------------------------:|:-------------------------:
-![](sample_imgs/sample_plot_4.jpeg) |  ![](sample_imgs/sample_plot_1.jpeg)
+|              Example 1              |              Example 2              |
+|:-----------------------------------:|:-----------------------------------:|
+| ![](sample_imgs/sample_plot_4.jpeg) | ![](sample_imgs/sample_plot_1.jpeg) |
 
-Example 3           |  Example 4
-:-------------------------:|:-------------------------:
-![](sample_imgs/sample_plot_2.jpeg) |  ![](sample_imgs/sample_plot_3.jpeg)
+|              Example 3              |              Example 4              |
+|:-----------------------------------:|:-----------------------------------:|
+| ![](sample_imgs/sample_plot_2.jpeg) | ![](sample_imgs/sample_plot_3.jpeg) |
 
 ## Coming soon
 * better documentations
